@@ -53,6 +53,11 @@ body {
     padding: 40px 20px;
     position: relative;
     z-index: 1;
+    overflow: hidden;
+}
+
+html, body {
+    overflow-x: hidden;
 }
 
 .header {
@@ -106,6 +111,8 @@ body {
     border: 1px solid var(--card-border);
     box-shadow: var(--shadow);
     animation: fadeInUp 0.8s ease;
+    overflow: hidden;
+    max-width: 100%;
 }
 
 @keyframes fadeInUp {
