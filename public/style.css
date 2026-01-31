@@ -566,7 +566,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .section-subtitle {
     font-size: 16px;
     font-weight: 600;
-    color: #444;
+    color: #ffffff;
     margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
@@ -590,6 +590,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .formula-line strong {
     color: #333;
+}
+.formula-line em {
+    font-style: normal;
+    color: #667eea;
+    font-weight: 600;
 }
 
 /* Toast */

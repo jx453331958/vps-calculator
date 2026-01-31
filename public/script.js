@@ -176,6 +176,14 @@ async function calculate() {
     // Update multi-currency display
     updateCurrencyDisplay(remainingValue, currency);
     
+    // Update formula with real values
+    const cycleNames = { 'monthly': '月付(30天)', 'quarterly': '季付(90天)', 'semi-annually': '半年付(180天)', 'annually': '年付(365天)' };
+    document.getElementById('formulaBox').innerHTML = `
+        <div class="formula-line"><strong>剩余天数</strong> = ${expiryDateStr} − ${currentDateStr} = <em>${remainingDays} 天</em></div>
+        <div class="formula-line"><strong>每日成本</strong> = ${price} ${currency} ÷ ${cycleDays}天（${cycleNames[paymentCycle]}） = <em>${formatCurrency(dailyCostActual, currency)} ${currency}/天</em></div>
+        <div class="formula-line"><strong>剩余价值</strong> = ${formatCurrency(dailyCostActual, currency)} × ${remainingDays} = <em>${formatCurrency(remainingValue, currency)} ${currency}</em></div>
+    `;
+    
     // Show results
     document.getElementById('results').style.display = 'block';
     
@@ -190,7 +198,14 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     const currencyGrid = document.getElementById('currencyGrid');
     currencyGrid.innerHTML = '';
     
-    CURRENCIES.forEach(currency => {
+    // Sort: CNY first, then rest
+    const sortedCurrencies = [...CURRENCIES].sort((a, b) => {
+        if (a === 'CNY') return -1;
+        if (b === 'CNY') return 1;
+        return 0;
+    });
+    
+    sortedCurrencies.forEach(currency => {
         if (currency === fromCurrency) return; // Skip the original currency
         
         const converted = convertCurrency(amount, fromCurrency, currency);
