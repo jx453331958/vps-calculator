@@ -2,8 +2,13 @@ version: '3.8'
 
 services:
   vps-calculator:
-    build: .
+    image: node:18-alpine
     container_name: vps-calculator
+    working_dir: /app
+    volumes:
+      - .:/app
+      - vps_node_modules:/app/node_modules
+    command: sh -c "npm install --production && node server.js"
     ports:
       - "3457:3457"
     environment:
@@ -16,3 +21,6 @@ services:
       timeout: 3s
       retries: 3
       start_period: 5s
+
+volumes:
+  vps_node_modules:
