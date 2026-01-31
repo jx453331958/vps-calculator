@@ -18,14 +18,31 @@
         </header>
 
         <div class="card input-card">
-            <h2 class="card-title">购买信息</h2>
+            <h2 class="card-title">VPS 信息</h2>
             
             <div class="form-row">
                 <div class="form-group">
-                    <label for="price">购买金额 <span id="priceCurrency">(CNY)</span></label>
+                    <label for="price">购买金额 <span id="priceCurrency">(USD)</span></label>
                     <input type="number" id="price" placeholder="输入金额" step="0.01" min="0">
                 </div>
 
+                <div class="form-group">
+                    <label for="currency">货币种类</label>
+                    <select id="currency" class="full-select">
+                        <option value="USD" selected>USD - 美元</option>
+                        <option value="EUR">EUR - 欧元</option>
+                        <option value="GBP">GBP - 英镑</option>
+                        <option value="CNY">CNY - 人民币</option>
+                        <option value="JPY">JPY - 日元</option>
+                        <option value="HKD">HKD - 港币</option>
+                        <option value="SGD">SGD - 新加坡元</option>
+                        <option value="AUD">AUD - 澳元</option>
+                        <option value="CAD">CAD - 加元</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
                     <label for="paymentCycle">付款周期</label>
                     <select id="paymentCycle" class="full-select">
@@ -35,34 +52,17 @@
                         <option value="annually">年付</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="currency">货币种类</label>
-                    <select id="currency" class="full-select">
-                        <option value="USD">USD - 美元</option>
-                        <option value="EUR">EUR - 欧元</option>
-                        <option value="GBP">GBP - 英镑</option>
-                        <option value="CNY" selected>CNY - 人民币</option>
-                        <option value="JPY">JPY - 日元</option>
-                        <option value="HKD">HKD - 港币</option>
-                        <option value="SGD">SGD - 新加坡元</option>
-                        <option value="AUD">AUD - 澳元</option>
-                        <option value="CAD">CAD - 加元</option>
-                    </select>
-                </div>
 
                 <div class="form-group">
-                    <label for="exchangeRate">今日汇率 <span id="rateCurrency">(CNY)</span><span class="api-source">API: ExchangeRate-API</span></label>
+                    <label for="exchangeRate">今日汇率 <span id="rateCurrency">(USD)</span><span class="api-source">API: ExchangeRate-API</span></label>
                     <input type="text" id="exchangeRate" class="rate-display" readonly placeholder="加载中...">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="purchaseDate">购买日期</label>
-                    <input type="date" id="purchaseDate" class="date-input">
+                    <label for="currentDate">当前日期</label>
+                    <input type="date" id="currentDate" class="date-input">
                 </div>
 
                 <div class="form-group">
@@ -78,8 +78,14 @@
         </div>
 
         <div id="results" class="results-container" style="display: none;">
-            <div class="card result-card">
-                <h2 class="card-title">计算结果</h2>
+            <div class="card result-card" id="resultCard">
+                <div class="result-header">
+                    <h2 class="card-title">计算结果</h2>
+                    <div class="screenshot-actions">
+                        <button class="screenshot-btn" onclick="screenshotToClipboard()" title="复制截图到剪贴板">📋 复制截图</button>
+                        <button class="screenshot-btn secondary" onclick="screenshotDownload()" title="下载截图">💾 下载</button>
+                    </div>
+                </div>
                 
                 <div class="progress-section">
                     <div class="progress-label">
@@ -113,14 +119,24 @@
                         <div id="remainingDays" class="stat-value">-</div>
                     </div>
                 </div>
-            </div>
 
-            <div class="card currency-card">
-                <h2 class="card-title">
-                    多币种显示
-                    <span class="update-time" id="updateTime">-</span>
-                </h2>
-                <div id="currencyGrid" class="currency-grid"></div>
+                <div class="currency-section">
+                    <h3 class="section-subtitle">
+                        剩余价值（多币种）
+                        <span class="update-time" id="updateTime">-</span>
+                    </h3>
+                    <div id="currencyGrid" class="currency-grid"></div>
+                </div>
+
+                <div class="formula-section">
+                    <h3 class="section-subtitle">计算公式</h3>
+                    <div class="formula-box">
+                        <div class="formula-line"><strong>剩余天数</strong> = 到期日期 − 当前日期</div>
+                        <div class="formula-line"><strong>每日成本</strong> = 购买金额 ÷ 付款周期天数</div>
+                        <div class="formula-line"><strong>剩余价值</strong> = 每日成本 × 剩余天数</div>
+                        <div class="formula-line"><strong>多币种价值</strong> = 剩余价值 × 实时汇率</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -129,6 +145,7 @@
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

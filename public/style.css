@@ -524,3 +524,91 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .loading {
     animation: pulse 1.5s ease-in-out infinite;
 }
+
+/* Result header with screenshot buttons */
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.result-header .card-title {
+    margin-bottom: 0;
+}
+.screenshot-actions {
+    display: flex;
+    gap: 8px;
+}
+.screenshot-btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    transition: all 0.2s;
+}
+.screenshot-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+.screenshot-btn.secondary {
+    background: linear-gradient(135deg, #a8b5d6, #8e99b4);
+}
+
+/* Currency section inside result card */
+.currency-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+}
+.section-subtitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Formula section */
+.formula-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+}
+.formula-box {
+    background: #f8f9fc;
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-size: 14px;
+    line-height: 2;
+    color: #555;
+    font-family: 'SF Mono', 'Menlo', monospace;
+}
+.formula-line strong {
+    color: #333;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 9999;
+    pointer-events: none;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}

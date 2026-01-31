@@ -90,11 +90,11 @@ function setDefaultDates() {
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
     
-    const purchaseDateInput = document.getElementById('purchaseDate');
+    const currentDateInput = document.getElementById('currentDate');
     const expiryDateInput = document.getElementById('expiryDate');
     
-    if (!purchaseDateInput.value) {
-        purchaseDateInput.value = todayStr;
+    if (!currentDateInput.value) {
+        currentDateInput.value = todayStr;
     }
     
     // Set default expiry to 1 month from today if not set
@@ -111,7 +111,7 @@ async function calculate() {
     const price = parseFloat(document.getElementById('price').value);
     const currency = document.getElementById('currency').value;
     const paymentCycle = document.getElementById('paymentCycle').value;
-    const purchaseDateStr = document.getElementById('purchaseDate').value;
+    const currentDateStr = document.getElementById('currentDate').value;
     const expiryDateStr = document.getElementById('expiryDate').value;
     
     // Validation
@@ -120,8 +120,8 @@ async function calculate() {
         return;
     }
     
-    if (!purchaseDateStr) {
-        alert('请选择购买日期');
+    if (!currentDateStr) {
+        alert('请选择当前日期');
         return;
     }
     
@@ -140,35 +140,27 @@ async function calculate() {
     }
     
     // Parse dates
-    const purchaseDate = new Date(purchaseDateStr);
+    const currentDate = new Date(currentDateStr);
     const expiryDate = new Date(expiryDateStr);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate day calculation
+    currentDate.setHours(0, 0, 0, 0);
+    expiryDate.setHours(0, 0, 0, 0);
     
-    // Validation: expiry date should be after purchase date
-    if (expiryDate <= purchaseDate) {
-        alert('到期时间必须晚于购买日期');
+    // Validation: expiry date should be after current date
+    if (expiryDate <= currentDate) {
+        alert('到期时间必须晚于当前日期');
         return;
     }
     
     // Calculate days
-    const totalDays = daysBetween(purchaseDate, expiryDate);
-    const usedDays = Math.max(0, daysBetween(purchaseDate, today));
-    const remainingDays = Math.max(0, daysBetween(today, expiryDate));
+    const cycleDays = CYCLE_DAYS[paymentCycle];
+    const remainingDays = daysBetween(currentDate, expiryDate);
+    const usedDays = Math.max(0, cycleDays - remainingDays);
     
-    // If today is after expiry, show warning
-    if (today > expiryDate) {
-        if (!confirm('VPS 已过期！是否继续计算？')) {
-            return;
-        }
-    }
-    
-    // Calculate values (based on actual days)
-    const dailyCostActual = price / totalDays;
+    // Calculate values
+    const dailyCostActual = price / cycleDays;
     const usedValue = dailyCostActual * usedDays;
-    const remainingValue = Math.max(0, price - usedValue);
-    const progressPercent = Math.min(100, (usedDays / totalDays) * 100);
-    
+    const remainingValue = dailyCostActual * remainingDays;
+    const progressPercent = Math.min(100, (usedDays / cycleDays) * 100);
     // Update progress bar
     document.getElementById('progressBar').style.width = progressPercent + '%';
     document.getElementById('progressPercent').textContent = progressPercent.toFixed(1) + '%';
@@ -217,6 +209,53 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     const now = new Date();
     const timeStr = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
     document.getElementById('updateTime').textContent = `更新于 ${timeStr}`;
+}
+
+// Screenshot to clipboard
+async function screenshotToClipboard() {
+    const card = document.getElementById('resultCard');
+    try {
+        const canvas = await html2canvas(card, { backgroundColor: '#ffffff', scale: 2 });
+        canvas.toBlob(async (blob) => {
+            try {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                showToast('✅ 截图已复制到剪贴板');
+            } catch (e) {
+                // Fallback: download
+                screenshotDownload();
+                showToast('⚠️ 剪贴板不可用，已下载截图');
+            }
+        });
+    } catch (e) {
+        alert('截图失败: ' + e.message);
+    }
+}
+
+// Screenshot download
+async function screenshotDownload() {
+    const card = document.getElementById('resultCard');
+    try {
+        const canvas = await html2canvas(card, { backgroundColor: '#ffffff', scale: 2 });
+        const link = document.createElement('a');
+        link.download = `vps-value-${new Date().toISOString().slice(0,10)}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+        showToast('✅ 截图已下载');
+    } catch (e) {
+        alert('截图失败: ' + e.message);
+    }
+}
+
+// Toast notification
+function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2000);
 }
 
 // Allow Enter key to trigger calculation
