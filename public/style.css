@@ -489,6 +489,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         gap: 15px;
     }
     
+    /* 日期行在移动端保持两列 */
+    .form-row:last-of-type {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
     .stats-grid {
         grid-template-columns: 1fr;
     }
