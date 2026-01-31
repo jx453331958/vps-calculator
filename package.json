@@ -1,0 +1,17 @@
+{
+  "name": "vps-calculator",
+  "version": "1.0.0",
+  "description": "VPS Remaining Value Calculator with real-time exchange rates",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["vps", "calculator", "exchange-rate"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0"
+  }
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPS 剩余价值计算器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="title">
+                VPS 剩余价值计算器
+            </h1>
+            <p class="subtitle">实时汇率 · 精准计算</p>
+        </header>
+
+        <div class="card input-card">
+            <h2 class="card-title">购买信息</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price">购买金额 <span id="priceCurrency">(CNY)</span></label>
+                    <input type="number" id="price" placeholder="输入金额" step="0.01" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentCycle">付款周期</label>
+                    <select id="paymentCycle" class="full-select">
+                        <option value="monthly">月付</option>
+                        <option value="quarterly">季付</option>
+                        <option value="semi-annually">半年付</option>
+                        <option value="annually">年付</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="currency">货币种类</label>
+                    <select id="currency" class="full-select">
+                        <option value="USD">USD - 美元</option>
+                        <option value="EUR">EUR - 欧元</option>
+                        <option value="GBP">GBP - 英镑</option>
+                        <option value="CNY" selected>CNY - 人民币</option>
+                        <option value="JPY">JPY - 日元</option>
+                        <option value="HKD">HKD - 港币</option>
+                        <option value="SGD">SGD - 新加坡元</option>
+                        <option value="AUD">AUD - 澳元</option>
+                        <option value="CAD">CAD - 加元</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="exchangeRate">今日汇率 <span id="rateCurrency">(CNY)</span><span class="api-source">API: ExchangeRate-API</span></label>
+                    <input type="text" id="exchangeRate" class="rate-display" readonly placeholder="加载中...">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="purchaseDate">购买日期</label>
+                    <input type="date" id="purchaseDate" class="date-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="expiryDate">到期时间</label>
+                    <input type="date" id="expiryDate" class="date-input">
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculate()">
+                <span class="btn-text">计算剩余价值</span>
+                <span class="btn-icon">→</span>
+            </button>
+        </div>
+
+        <div id="results" class="results-container" style="display: none;">
+            <div class="card result-card">
+                <h2 class="card-title">计算结果</h2>
+                
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>使用进度</span>
+                        <span id="progressPercent" class="progress-value">0%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div id="progressBar" class="progress-bar"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span id="usedInfo">已使用 0 天</span>
+                        <span id="remainingInfo">剩余 0 天</span>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">每日成本</div>
+                        <div id="dailyCost" class="stat-value">-</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">已消耗价值</div>
+                        <div id="usedValue" class="stat-value">-</div>
+                    </div>
+                    <div class="stat-item highlight">
+                        <div class="stat-label">剩余价值</div>
+                        <div id="remainingValue" class="stat-value primary">-</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">剩余天数</div>
+                        <div id="remainingDays" class="stat-value">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card currency-card">
+                <h2 class="card-title">
+                    多币种显示
+                    <span class="update-time" id="updateTime">-</span>
+                </h2>
+                <div id="currencyGrid" class="currency-grid"></div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>💡 使用实时汇率 API 提供准确换算</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
