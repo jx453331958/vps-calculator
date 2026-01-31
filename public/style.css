@@ -135,11 +135,6 @@ body {
     margin-bottom: 20px;
 }
 
-.form-row:last-of-type {
-    margin-bottom: 30px;
-}
-
-.form-group {
     margin-bottom: 0;
 }
 
@@ -489,16 +484,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         gap: 15px;
     }
     
-    .form-row:last-of-type {
-        grid-template-columns: 1fr 1fr;
-        max-width: 100%;
-        overflow: hidden;
-    }
     
-    .form-row:last-of-type .form-group {
-        min-width: 0;
-        overflow: hidden;
-    }
     
     .stats-grid {
         grid-template-columns: 1fr;
