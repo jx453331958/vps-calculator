@@ -226,33 +226,74 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     document.getElementById('updateTime').textContent = `更新于 ${timeStr}`;
 }
 
+// Capture the result card as canvas
+async function captureCard() {
+    const card = document.getElementById('resultCard');
+    // html2canvas needs explicit bg + must traverse into children
+    return await html2canvas(card, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        onclone: (doc) => {
+            // Force white bg and visible text on the cloned card
+            const cloned = doc.getElementById('resultCard');
+            cloned.style.background = '#ffffff';
+            cloned.style.color = '#333';
+            cloned.style.padding = '32px';
+            // Fix subtitle colors for screenshot
+            cloned.querySelectorAll('.section-subtitle').forEach(el => {
+                el.style.color = '#333';
+            });
+            cloned.querySelectorAll('.update-time').forEach(el => {
+                el.style.color = '#888';
+            });
+            // Fix currency items
+            cloned.querySelectorAll('.currency-item').forEach(el => {
+                el.style.background = '#f0f2f5';
+                el.style.color = '#333';
+            });
+            cloned.querySelectorAll('.currency-code').forEach(el => {
+                el.style.color = '#555';
+            });
+            cloned.querySelectorAll('.currency-value').forEach(el => {
+                el.style.color = '#333';
+            });
+            // Fix stat items
+            cloned.querySelectorAll('.stat-item').forEach(el => {
+                el.style.color = '#333';
+            });
+            cloned.querySelectorAll('.stat-label').forEach(el => {
+                el.style.color = '#888';
+            });
+            cloned.querySelectorAll('.stat-value').forEach(el => {
+                el.style.color = '#333';
+            });
+            cloned.querySelectorAll('.progress-info span').forEach(el => {
+                el.style.color = '#666';
+            });
+        }
+    });
+}
+
 // Screenshot to clipboard
 async function screenshotToClipboard() {
-    const card = document.getElementById('resultCard');
     try {
-        const canvas = await html2canvas(card, { backgroundColor: '#ffffff', scale: 2 });
-        canvas.toBlob(async (blob) => {
-            try {
-                await navigator.clipboard.write([
-                    new ClipboardItem({ 'image/png': blob })
-                ]);
-                showToast('✅ 截图已复制到剪贴板');
-            } catch (e) {
-                // Fallback: download
-                screenshotDownload();
-                showToast('⚠️ 剪贴板不可用，已下载截图');
-            }
-        });
+        const canvas = await captureCard();
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+        ]);
+        showToast('✅ 截图已复制到剪贴板');
     } catch (e) {
-        alert('截图失败: ' + e.message);
+        showToast('⚠️ 复制失败: ' + e.message);
     }
 }
 
 // Screenshot download
 async function screenshotDownload() {
-    const card = document.getElementById('resultCard');
     try {
-        const canvas = await html2canvas(card, { backgroundColor: '#ffffff', scale: 2 });
+        const canvas = await captureCard();
         const link = document.createElement('a');
         link.download = `vps-value-${new Date().toISOString().slice(0,10)}.png`;
         link.href = canvas.toDataURL();
