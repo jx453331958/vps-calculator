@@ -617,6 +617,7 @@ span.flatpickr-weekday {
 }
 .result-header .card-title {
     margin-bottom: 0;
+    text-align: left;
 }
 .screenshot-actions {
     display: flex;
