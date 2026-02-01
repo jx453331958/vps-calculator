@@ -254,44 +254,40 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     document.getElementById('updateTime').textContent = `更新于 ${timeStr}`;
 }
 
-// Capture the full page (input + result) as canvas
+// Capture the container as a blob using modern-screenshot
 async function captureFullPage() {
     const container = document.querySelector('.container');
-    return await html2canvas(container, {
-        backgroundColor: '#0f0c29',
+    return await modernScreenshot.domToBlob(container, {
         scale: 2,
-        useCORS: true,
-        logging: false,
-        onclone: (doc) => {
-            const c = doc.querySelector('.container');
-            c.style.padding = '32px';
-            c.style.maxWidth = '800px';
-            // Replace background-animation with a solid gradient background on body
-            const bg = doc.querySelector('.background-animation');
-            if (bg) bg.style.display = 'none';
-            doc.body.style.background = 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)';
-            // Hide screenshot buttons in the capture
-            doc.querySelectorAll('.screenshot-actions').forEach(el => el.style.display = 'none');
-            // Remove backdrop-filter (html2canvas doesn't support it), use solid fallback
-            c.querySelectorAll('.card').forEach(el => {
-                el.style.backdropFilter = 'none';
-                el.style.webkitBackdropFilter = 'none';
-                el.style.background = 'rgba(30, 27, 65, 0.85)';
-            });
+        backgroundColor: '#1a1740',
+        style: {
+            padding: '32px',
+            maxWidth: '800px',
+        },
+        filter: (node) => {
+            // Hide background animation and screenshot buttons
+            if (node instanceof Element) {
+                if (node.classList.contains('background-animation')) return false;
+                if (node.classList.contains('screenshot-actions')) return false;
+            }
+            return true;
+        },
+        onCloneNode: (cloned) => {
+            if (!(cloned instanceof Element)) return;
             // Ensure results visible
-            const results = doc.getElementById('results');
-            if (results) results.style.display = 'block';
-        }
+            if (cloned.id === 'results') {
+                cloned.style.display = 'block';
+            }
+        },
     });
 }
 
 // Screenshot to clipboard
 async function screenshotToClipboard() {
     try {
-        const canvas = await captureFullPage();
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const blob = await captureFullPage();
 
-        // Try clipboard API - must attempt write directly, feature detection alone is unreliable
+        // Try clipboard API directly
         try {
             await navigator.clipboard.write([
                 new ClipboardItem({ 'image/png': blob })
@@ -322,8 +318,7 @@ function downloadBlob(blob) {
 // Screenshot download
 async function screenshotDownload() {
     try {
-        const canvas = await captureFullPage();
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        const blob = await captureFullPage();
         downloadBlob(blob);
         showToast('✅ 截图已下载');
     } catch (e) {
