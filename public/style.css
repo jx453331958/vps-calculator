@@ -733,4 +733,12 @@ span.flatpickr-weekday {
     .header {
         margin-bottom: 30px;
     }
+
+    .lang-toggle-btn {
+        position: static;
+        display: block;
+        margin-left: auto;
+        margin-bottom: 8px;
+        width: fit-content;
+    }
 }
