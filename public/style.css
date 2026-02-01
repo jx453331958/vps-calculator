@@ -59,10 +59,8 @@ body {
     overflow-x: hidden;
 }
 
-html, body {
-    overflow-x: hidden;
+html {
     overscroll-behavior-y: none;
-    -webkit-overflow-scrolling: touch;
 }
 
 .header {
