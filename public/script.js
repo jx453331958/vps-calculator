@@ -287,9 +287,8 @@ async function captureResultCard() {
 
     // Stitch two canvases vertically with a gap
     const gap = 40;
-    const padding = 48;
-    const width = inputCanvas.width + padding * 2;
-    const height = inputCanvas.height + resultCanvas.height + gap + padding * 2;
+    const width = Math.max(inputCanvas.width, resultCanvas.width);
+    const height = inputCanvas.height + resultCanvas.height + gap;
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -298,10 +297,8 @@ async function captureResultCard() {
     ctx.fillStyle = '#1a1740';
     ctx.fillRect(0, 0, width, height);
 
-    const inputX = padding;
-    const resultX = padding;
-    ctx.drawImage(inputCanvas, inputX, padding);
-    ctx.drawImage(resultCanvas, resultX, padding + inputCanvas.height + gap);
+    ctx.drawImage(inputCanvas, 0, 0);
+    ctx.drawImage(resultCanvas, 0, inputCanvas.height + gap);
 
     return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 }
