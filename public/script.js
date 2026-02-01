@@ -256,30 +256,24 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     document.getElementById('updateTime').textContent = `更新于 ${timeStr}`;
 }
 
-// Capture the container as a blob using modern-screenshot
-async function captureFullPage() {
-    const container = document.querySelector('.container');
-    return await domToBlob(container, {
+// Capture the result card as a blob using modern-screenshot
+async function captureResultCard() {
+    const card = document.getElementById('resultCard');
+    if (!card) throw new Error('请先计算结果');
+    return await domToBlob(card, {
         scale: 2,
         backgroundColor: '#1a1740',
+        width: card.scrollWidth,
+        height: card.scrollHeight,
         style: {
-            padding: '32px',
-            maxWidth: '800px',
+            padding: '24px',
+            borderRadius: '0',
+            margin: '0',
+            overflow: 'visible',
         },
         filter: (node) => {
-            // Hide background animation and screenshot buttons
-            if (node instanceof Element) {
-                if (node.classList.contains('background-animation')) return false;
-                if (node.classList.contains('screenshot-actions')) return false;
-            }
+            if (node instanceof Element && node.classList.contains('screenshot-actions')) return false;
             return true;
-        },
-        onCloneNode: (cloned) => {
-            if (!(cloned instanceof Element)) return;
-            // Ensure results visible
-            if (cloned.id === 'results') {
-                cloned.style.display = 'block';
-            }
         },
     });
 }
@@ -287,7 +281,7 @@ async function captureFullPage() {
 // Screenshot to clipboard
 async function screenshotToClipboard() {
     try {
-        const blob = await captureFullPage();
+        const blob = await captureResultCard();
 
         // Try clipboard API directly
         try {
@@ -320,7 +314,7 @@ function downloadBlob(blob) {
 // Screenshot download
 async function screenshotDownload() {
     try {
-        const blob = await captureFullPage();
+        const blob = await captureResultCard();
         downloadBlob(blob);
         showToast('✅ 截图已下载');
     } catch (e) {
