@@ -251,13 +251,14 @@ function updateCurrencyDisplay(amount, fromCurrency) {
 
 // Capture a single element as canvas
 function captureElement(el, opts = {}) {
+    const padding = 24;
     return domToCanvas(el, {
         scale: 2,
         backgroundColor: '#1a1740',
-        width: el.scrollWidth,
-        height: el.scrollHeight,
+        width: el.scrollWidth + padding * 2,
+        height: el.scrollHeight + padding * 2,
         style: {
-            padding: '24px',
+            padding: padding + 'px',
             borderRadius: '0',
             margin: '0',
             overflow: 'visible',
