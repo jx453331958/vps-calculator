@@ -310,51 +310,49 @@ async function captureFullPage() {
     });
 }
 
-// Screenshot to clipboard (with HTTP fallback)
+// Screenshot to clipboard
 async function screenshotToClipboard() {
     try {
         const canvas = await captureFullPage();
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        // Try modern clipboard API first
-        if (navigator.clipboard && navigator.clipboard.write) {
+
+        // Try clipboard API - must attempt write directly, feature detection alone is unreliable
+        try {
             await navigator.clipboard.write([
                 new ClipboardItem({ 'image/png': blob })
             ]);
             showToast('✅ 截图已复制到剪贴板');
-        } else {
-            // Fallback: auto-download instead
-            const link = document.createElement('a');
-            link.download = `vps-value-${new Date().toISOString().slice(0,10)}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-            showToast('⚠️ HTTP 环境不支持复制到剪贴板，已自动下载');
+            return;
+        } catch (clipErr) {
+            // clipboard.write not supported or permission denied, fall through
         }
+
+        // Fallback: download
+        downloadBlob(blob);
+        showToast('⚠️ 当前浏览器不支持复制图片到剪贴板，已自动下载');
     } catch (e) {
-        // Final fallback: try download
-        try {
-            const canvas = await captureFullPage();
-            const link = document.createElement('a');
-            link.download = `vps-value-${new Date().toISOString().slice(0,10)}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-            showToast('⚠️ 复制失败，已自动下载截图');
-        } catch (e2) {
-            showToast('⚠️ 截图失败: ' + e.message);
-        }
+        showToast('⚠️ 截图失败: ' + e.message);
     }
+}
+
+function downloadBlob(blob) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `vps-value-${new Date().toISOString().slice(0,10)}.png`;
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
 }
 
 // Screenshot download
 async function screenshotDownload() {
     try {
         const canvas = await captureFullPage();
-        const link = document.createElement('a');
-        link.download = `vps-value-${new Date().toISOString().slice(0,10)}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        downloadBlob(blob);
         showToast('✅ 截图已下载');
     } catch (e) {
-        alert('截图失败: ' + e.message);
+        showToast('⚠️ 截图失败: ' + e.message);
     }
 }
 
