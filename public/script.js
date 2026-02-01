@@ -277,7 +277,8 @@ async function captureResultCard() {
     };
 
     // Use the same width for both cards so they align
-    const captureWidth = Math.max(inputCard.offsetWidth, resultCard.offsetWidth);
+    const padding = 24;
+    const captureWidth = Math.max(inputCard.offsetWidth, resultCard.offsetWidth) + padding * 2;
     const [inputCanvas, resultCanvas] = await Promise.all([
         captureElement(inputCard, { filter: filterScreenshotBtns, width: captureWidth }),
         captureElement(resultCard, { filter: filterScreenshotBtns, width: captureWidth }),
