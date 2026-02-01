@@ -255,8 +255,6 @@ function captureElement(el, opts = {}) {
     return domToCanvas(el, {
         scale: 2,
         backgroundColor: '#1a1740',
-        width: el.scrollWidth + padding * 2,
-        height: el.scrollHeight + padding * 2,
         style: {
             padding: padding + 'px',
             borderRadius: '0',
@@ -279,10 +277,10 @@ async function captureResultCard() {
     };
 
     // Use the same width for both cards so they align
-    const captureWidth = Math.max(inputCard.scrollWidth, resultCard.scrollWidth);
+    const captureWidth = Math.max(inputCard.offsetWidth, resultCard.offsetWidth);
     const [inputCanvas, resultCanvas] = await Promise.all([
-        captureElement(inputCard, { filter: filterScreenshotBtns, width: captureWidth + 48 }),
-        captureElement(resultCard, { filter: filterScreenshotBtns, width: captureWidth + 48 }),
+        captureElement(inputCard, { filter: filterScreenshotBtns, width: captureWidth }),
+        captureElement(resultCard, { filter: filterScreenshotBtns, width: captureWidth }),
     ]);
 
     // Stitch two canvases vertically with a gap
