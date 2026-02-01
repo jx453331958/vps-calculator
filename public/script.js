@@ -295,8 +295,8 @@ async function captureResultCard() {
     ctx.fillStyle = '#1a1740';
     ctx.fillRect(0, 0, width, height);
 
-    const inputX = (width - inputCanvas.width) / 2;
-    const resultX = (width - resultCanvas.width) / 2;
+    const inputX = padding;
+    const resultX = padding;
     ctx.drawImage(inputCanvas, inputX, padding);
     ctx.drawImage(resultCanvas, resultX, padding + inputCanvas.height + gap);
 
