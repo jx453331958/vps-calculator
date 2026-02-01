@@ -1,4 +1,4 @@
-import { domToBlob } from 'https://cdn.jsdelivr.net/npm/modern-screenshot@4.6.8/+esm';
+import { domToBlob, domToCanvas } from 'https://cdn.jsdelivr.net/npm/modern-screenshot@4.6.8/+esm';
 
 let exchangeRates = null;
 
@@ -256,26 +256,58 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     document.getElementById('updateTime').textContent = `更新于 ${timeStr}`;
 }
 
-// Capture the result card as a blob using modern-screenshot
-async function captureResultCard() {
-    const card = document.getElementById('resultCard');
-    if (!card) throw new Error('请先计算结果');
-    return await domToBlob(card, {
+// Capture a single element as canvas
+function captureElement(el, opts = {}) {
+    return domToCanvas(el, {
         scale: 2,
         backgroundColor: '#1a1740',
-        width: card.scrollWidth,
-        height: card.scrollHeight,
+        width: el.scrollWidth,
+        height: el.scrollHeight,
         style: {
             padding: '24px',
             borderRadius: '0',
             margin: '0',
             overflow: 'visible',
         },
-        filter: (node) => {
-            if (node instanceof Element && node.classList.contains('screenshot-actions')) return false;
-            return true;
-        },
+        ...opts,
     });
+}
+
+// Capture VPS info + result cards, stitch into one blob
+async function captureResultCard() {
+    const inputCard = document.querySelector('.input-card');
+    const resultCard = document.getElementById('resultCard');
+    if (!resultCard) throw new Error('请先计算结果');
+
+    const filterScreenshotBtns = (node) => {
+        if (node instanceof Element && node.classList.contains('screenshot-actions')) return false;
+        return true;
+    };
+
+    const [inputCanvas, resultCanvas] = await Promise.all([
+        captureElement(inputCard, { filter: filterScreenshotBtns }),
+        captureElement(resultCard, { filter: filterScreenshotBtns }),
+    ]);
+
+    // Stitch two canvases vertically with a gap
+    const gap = 40;
+    const padding = 48;
+    const width = Math.max(inputCanvas.width, resultCanvas.width) + padding * 2;
+    const height = inputCanvas.height + resultCanvas.height + gap + padding * 2;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#1a1740';
+    ctx.fillRect(0, 0, width, height);
+
+    const inputX = (width - inputCanvas.width) / 2;
+    const resultX = (width - resultCanvas.width) / 2;
+    ctx.drawImage(inputCanvas, inputX, padding);
+    ctx.drawImage(resultCanvas, resultX, padding + inputCanvas.height + gap);
+
+    return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 }
 
 // Screenshot to clipboard
