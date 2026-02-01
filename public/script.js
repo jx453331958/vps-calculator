@@ -61,7 +61,7 @@ function updateExchangeRateDisplay() {
     const rateDisplay = document.getElementById('exchangeRate');
     const priceCurrencyLabel = document.getElementById('priceCurrency');
     const rateCurrencyLabel = document.getElementById('rateCurrency');
-    
+
     // Update currency labels
     if (priceCurrencyLabel) {
         priceCurrencyLabel.textContent = `(${currency})`;
@@ -69,13 +69,13 @@ function updateExchangeRateDisplay() {
     if (rateCurrencyLabel) {
         rateCurrencyLabel.textContent = `(${currency})`;
     }
-    
+
     if (!exchangeRates) {
         rateDisplay.value = '';
         rateDisplay.placeholder = '加载中...';
         return;
     }
-    
+
     if (currency === 'CNY') {
         rateDisplay.value = '1.0000';
     } else {
@@ -90,11 +90,11 @@ function updateExchangeRateDisplay() {
 // Convert amount from one currency to another
 function convertCurrency(amount, fromCurrency, toCurrency) {
     if (!exchangeRates) return null;
-    
+
     // Convert to USD first, then to target currency
     const amountInUSD = amount / exchangeRates[fromCurrency];
     const convertedAmount = amountInUSD * exchangeRates[toCurrency];
-    
+
     return convertedAmount;
 }
 
@@ -111,28 +111,30 @@ function daysBetween(date1, date2) {
     return Math.ceil(diffTime / oneDay);
 }
 
-// Set default dates
-function setDefaultDates() {
+// Set today's date as static display
+function initCurrentDate() {
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
+    const el = document.getElementById('currentDate');
+    el.textContent = todayStr;
+    el.dataset.value = todayStr;
+}
 
-    const currentDateInput = document.getElementById('currentDate');
-    const expiryDateInput = document.getElementById('expiryDate');
+// Initialize flatpickr for expiry date only
+function initDatePickers() {
+    const today = new Date();
+    const nextMonth = new Date(today);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
 
-    if (!currentDateInput.value) {
-        currentDateInput.value = todayStr;
-        // Force setAttribute for iOS Safari compatibility
-        currentDateInput.setAttribute('value', todayStr);
-    }
-
-    // Set default expiry to 1 month from today if not set
-    if (!expiryDateInput.value) {
-        const nextMonth = new Date(today);
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
-        const expiryStr = nextMonth.toISOString().split('T')[0];
-        expiryDateInput.value = expiryStr;
-        expiryDateInput.setAttribute('value', expiryStr);
-    }
+    flatpickr('#expiryDate', {
+        locale: 'zh',
+        dateFormat: 'Y-m-d',
+        disableMobile: true,
+        defaultDate: nextMonth,
+        onChange(selectedDates, dateStr) {
+            if (dateStr) setTimeout(autoRecalculate, 0);
+        },
+    });
 }
 
 // Core calculation logic, silent=true skips alerts and scroll
@@ -140,27 +142,27 @@ async function doCalculate(silent = false) {
     const price = parseFloat(document.getElementById('price').value);
     const currency = document.getElementById('currency').value;
     const paymentCycle = document.getElementById('paymentCycle').value;
-    const currentDateStr = document.getElementById('currentDate').value;
+    const currentDateStr = document.getElementById('currentDate').dataset.value;
     const expiryDateStr = document.getElementById('expiryDate').value;
 
     // Validation
     if (!price || price <= 0) {
-        if (!silent) alert('请输入有效的购买金额');
+        if (!silent) showToast('请输入有效的购买金额', 'error');
         return false;
     }
     if (!currentDateStr) {
-        if (!silent) alert('请选择当前日期');
+        if (!silent) showToast('请选择当前日期', 'error');
         return false;
     }
     if (!expiryDateStr) {
-        if (!silent) alert('请选择到期时间');
+        if (!silent) showToast('请选择到期时间', 'error');
         return false;
     }
 
     if (!exchangeRates) {
         const success = await fetchExchangeRates();
         if (!success) {
-            if (!silent) alert('无法获取汇率数据，请检查网络连接后重试');
+            if (!silent) showToast('无法获取汇率数据，请检查网络连接后重试', 'error');
             return false;
         }
     }
@@ -171,7 +173,7 @@ async function doCalculate(silent = false) {
     expiryDate.setHours(0, 0, 0, 0);
 
     if (expiryDate <= currentDate) {
-        if (!silent) alert('到期时间必须晚于当前日期');
+        if (!silent) showToast('到期时间必须晚于当前日期', 'error');
         return false;
     }
 
@@ -181,12 +183,7 @@ async function doCalculate(silent = false) {
     const dailyCostActual = price / cycleDays;
     const usedValue = dailyCostActual * usedDays;
     const remainingValue = dailyCostActual * remainingDays;
-    const progressPercent = Math.min(100, (usedDays / cycleDays) * 100);
 
-    document.getElementById('progressBar').style.width = progressPercent + '%';
-    document.getElementById('progressPercent').textContent = progressPercent.toFixed(1) + '%';
-    document.getElementById('usedInfo').textContent = `已使用 ${usedDays} 天`;
-    document.getElementById('remainingInfo').textContent = `剩余 ${remainingDays} 天`;
     document.getElementById('dailyCost').textContent = formatCurrency(dailyCostActual, currency) + ' ' + currency;
     document.getElementById('usedValue').textContent = formatCurrency(usedValue, currency) + ' ' + currency;
     document.getElementById('remainingValue').textContent = formatCurrency(remainingValue, currency) + ' ' + currency;
@@ -225,20 +222,20 @@ function autoRecalculate() {
 function updateCurrencyDisplay(amount, fromCurrency) {
     const currencyGrid = document.getElementById('currencyGrid');
     currencyGrid.innerHTML = '';
-    
+
     // Sort: CNY first, then rest
     const sortedCurrencies = [...CURRENCIES].sort((a, b) => {
         if (a === 'CNY') return -1;
         if (b === 'CNY') return 1;
         return 0;
     });
-    
+
     sortedCurrencies.forEach(currency => {
         if (currency === fromCurrency) return; // Skip the original currency
-        
+
         const converted = convertCurrency(amount, fromCurrency, currency);
         if (converted === null) return;
-        
+
         const currencyItem = document.createElement('div');
         currencyItem.className = 'currency-item';
         currencyItem.innerHTML = `
@@ -247,7 +244,7 @@ function updateCurrencyDisplay(amount, fromCurrency) {
         `;
         currencyGrid.appendChild(currencyItem);
     });
-    
+
     // Update time
     const now = new Date();
     const timeStr = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
@@ -353,23 +350,24 @@ async function screenshotDownload() {
 }
 
 // Toast notification
-function showToast(msg) {
+function showToast(msg, type) {
     const toast = document.createElement('div');
-    toast.className = 'toast';
+    toast.className = 'toast' + (type === 'error' ? ' toast-error' : '');
     toast.textContent = msg;
     document.body.appendChild(toast);
     setTimeout(() => toast.classList.add('show'), 10);
-    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2000);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
 }
 
 // Allow Enter key to trigger calculation
 document.addEventListener('DOMContentLoaded', () => {
-    // Set default dates
-    setDefaultDates();
-    
+    // Initialize dates
+    initCurrentDate();
+    initDatePickers();
+
     // Pre-fetch exchange rates
     fetchExchangeRates();
-    
+
     // Listen for currency change to update exchange rate display
     document.getElementById('currency').addEventListener('change', updateExchangeRateDisplay);
 
@@ -378,9 +376,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => fetchExchangeRates(2));
     }
-    
+
     // Allow Enter key to calculate, and auto-recalculate on input change
-    const inputs = document.querySelectorAll('.input-card input, .input-card select');
+    // Exclude flatpickr-managed date inputs — their changes are handled by flatpickr onChange
+    const inputs = document.querySelectorAll('.input-card input:not([id="currentDate"]):not([id="expiryDate"]), .input-card select');
     inputs.forEach(input => {
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
