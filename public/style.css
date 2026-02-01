@@ -535,65 +535,6 @@ span.flatpickr-weekday {
     font-size: 0.9rem;
 }
 
-@media (max-width: 768px) {
-    .container {
-        padding: 30px 16px;
-        max-width: 100%;
-    }
-
-    .title {
-        font-size: 1.8rem;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr !important;
-        gap: 15px;
-    }
-
-    .form-group {
-        width: 100%;
-        max-width: 100%;
-        overflow: hidden;
-    }
-
-    .result-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .screenshot-actions {
-        width: 100%;
-        justify-content: flex-start;
-    }
-
-    .screenshot-btn {
-        flex: 1;
-        text-align: center;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .currency-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .card {
-        padding: 18px;
-        overflow-x: hidden;
-        margin-left: 0;
-        margin-right: 0;
-    }
-
-    .header {
-        margin-bottom: 30px;
-    }
-}
-
 /* Loading animation */
 @keyframes pulse {
     0%, 100% {
@@ -706,4 +647,63 @@ span.flatpickr-weekday {
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 8px 24px rgba(235, 51, 73, 0.3);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 30px 16px;
+        max-width: 100%;
+    }
+
+    .title {
+        font-size: 1.8rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+
+    .form-group {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .result-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .screenshot-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .screenshot-btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .currency-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card {
+        padding: 18px;
+        overflow-x: hidden;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .header {
+        margin-bottom: 30px;
+    }
 }
