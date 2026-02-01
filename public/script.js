@@ -258,50 +258,25 @@ function updateCurrencyDisplay(amount, fromCurrency) {
 async function captureFullPage() {
     const container = document.querySelector('.container');
     return await html2canvas(container, {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#0f0c29',
         scale: 2,
         useCORS: true,
         logging: false,
         onclone: (doc) => {
             const c = doc.querySelector('.container');
-            c.style.background = '#ffffff';
             c.style.padding = '32px';
             c.style.maxWidth = '800px';
-            // Hide background animation
+            // Replace background-animation with a solid gradient background on body
             const bg = doc.querySelector('.background-animation');
             if (bg) bg.style.display = 'none';
-            // Force body bg white
-            doc.body.style.background = '#ffffff';
+            doc.body.style.background = 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)';
             // Hide screenshot buttons in the capture
             doc.querySelectorAll('.screenshot-actions').forEach(el => el.style.display = 'none');
-            // Fix all text to dark colors for readability
-            const fixes = [
-                ['.title', { color: '#1a1a2e' }],
-                ['.subtitle', { color: '#555' }],
-                ['.card', { background: '#f8f9fa', color: '#333', border: '1px solid #e0e0e0' }],
-                ['.card-title', { color: '#333' }],
-                ['label', { color: '#555' }],
-                ['input, select', { color: '#333', background: '#fff', border: '1px solid #ccc' }],
-                ['.calculate-btn', { background: '#4361ee', color: '#fff' }],
-                ['.section-subtitle', { color: '#333' }],
-                ['.update-time', { color: '#888' }],
-                ['.currency-item', { background: '#f0f2f5', color: '#333' }],
-                ['.currency-code', { color: '#555' }],
-                ['.currency-value', { color: '#333' }],
-                ['.stat-item', { background: '#f0f2f5', color: '#333' }],
-                ['.stat-label', { color: '#888' }],
-                ['.stat-value', { color: '#333' }],
-                ['.progress-info span', { color: '#666' }],
-                ['.progress-label span', { color: '#333' }],
-                ['.formula-box', { background: '#f5f5f5', color: '#333' }],
-                ['.footer', { color: '#888' }],
-                ['.api-source', { color: '#999' }],
-                ['.result-card', { background: '#ffffff' }],
-                ['.input-card', { background: '#ffffff' }],
-                ['.header', { color: '#333' }],
-            ];
-            fixes.forEach(([sel, styles]) => {
-                c.querySelectorAll(sel).forEach(el => Object.assign(el.style, styles));
+            // Remove backdrop-filter (html2canvas doesn't support it), use solid fallback
+            c.querySelectorAll('.card').forEach(el => {
+                el.style.backdropFilter = 'none';
+                el.style.webkitBackdropFilter = 'none';
+                el.style.background = 'rgba(30, 27, 65, 0.85)';
             });
             // Ensure results visible
             const results = doc.getElementById('results');
