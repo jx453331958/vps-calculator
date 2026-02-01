@@ -31,23 +31,39 @@ app.get('/api/rates', async (req, res) => {
       return res.json(ratesCache.rates);
     }
 
-    // Fetch from exchangerate-api.com (free tier)
-    const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch exchange rates');
+    // Fetch from exchangerate-api.com (free tier) with timeout
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    let data;
+    try {
+      const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD', {
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`);
+      }
+      data = await response.json();
+    } catch (fetchErr) {
+      clearTimeout(timeout);
+      // If we have stale cache, return it
+      if (ratesCache.rates) {
+        console.warn('API fetch failed, returning stale cache:', fetchErr.message);
+        return res.json({ ...ratesCache.rates, stale: true });
+      }
+      throw fetchErr;
     }
 
-    const data = await response.json();
-    
     // Update cache
     ratesCache.rates = data;
     ratesCache.timestamp = now;
-    
+
     res.json(data);
   } catch (error) {
-    console.error('Error fetching exchange rates:', error);
-    res.status(500).json({ error: 'Failed to fetch exchange rates' });
+    console.error('Error fetching exchange rates:', error.message);
+    res.status(500).json({ error: 'Failed to fetch exchange rates', message: error.message });
   }
 });
 

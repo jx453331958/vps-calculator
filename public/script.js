@@ -11,22 +11,39 @@ const CYCLE_DAYS = {
     'annually': 365
 };
 
-// Fetch exchange rates on page load
-async function fetchExchangeRates() {
-    try {
-        const response = await fetch('/api/rates');
-        if (!response.ok) {
-            throw new Error('Failed to fetch exchange rates');
+// Fetch exchange rates with retry logic
+async function fetchExchangeRates(retries = 3) {
+    const rateDisplay = document.getElementById('exchangeRate');
+    const refreshBtn = document.getElementById('refreshRateBtn');
+
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            rateDisplay.value = '';
+            rateDisplay.placeholder = attempt > 1 ? `重试中(${attempt}/${retries})...` : '加载中...';
+            if (refreshBtn) refreshBtn.classList.add('spinning');
+
+            const response = await fetch('/api/rates');
+            if (!response.ok) {
+                throw new Error('Failed to fetch exchange rates');
+            }
+            const data = await response.json();
+            exchangeRates = data.rates;
+            updateExchangeRateDisplay();
+            if (refreshBtn) refreshBtn.classList.remove('spinning');
+            return true;
+        } catch (error) {
+            console.error(`Exchange rate fetch attempt ${attempt} failed:`, error);
+            if (attempt === retries) {
+                rateDisplay.value = '';
+                rateDisplay.placeholder = '加载失败，点击刷新';
+                if (refreshBtn) refreshBtn.classList.remove('spinning');
+                return false;
+            }
+            // Wait before retry (1s, 2s)
+            await new Promise(r => setTimeout(r, attempt * 1000));
         }
-        const data = await response.json();
-        exchangeRates = data.rates;
-        updateExchangeRateDisplay();
-        return true;
-    } catch (error) {
-        console.error('Error fetching exchange rates:', error);
-        document.getElementById('exchangeRate').placeholder = '汇率加载失败';
-        return false;
     }
+    return false;
 }
 
 // Update exchange rate display
@@ -89,19 +106,23 @@ function daysBetween(date1, date2) {
 function setDefaultDates() {
     const today = new Date();
     const todayStr = today.toISOString().split('T')[0];
-    
+
     const currentDateInput = document.getElementById('currentDate');
     const expiryDateInput = document.getElementById('expiryDate');
-    
+
     if (!currentDateInput.value) {
         currentDateInput.value = todayStr;
+        // Force setAttribute for iOS Safari compatibility
+        currentDateInput.setAttribute('value', todayStr);
     }
-    
+
     // Set default expiry to 1 month from today if not set
     if (!expiryDateInput.value) {
         const nextMonth = new Date(today);
         nextMonth.setMonth(nextMonth.getMonth() + 1);
-        expiryDateInput.value = nextMonth.toISOString().split('T')[0];
+        const expiryStr = nextMonth.toISOString().split('T')[0];
+        expiryDateInput.value = expiryStr;
+        expiryDateInput.setAttribute('value', expiryStr);
     }
 }
 
@@ -350,6 +371,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Listen for currency change to update exchange rate display
     document.getElementById('currency').addEventListener('change', updateExchangeRateDisplay);
+
+    // Refresh rate button
+    const refreshBtn = document.getElementById('refreshRateBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => fetchExchangeRates(2));
+    }
     
     // Allow Enter key to calculate
     const inputs = document.querySelectorAll('input, select');
