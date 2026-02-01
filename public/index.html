@@ -3,12 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VPS 剩余价值计算器 - 实时汇率换算，精准计算 VPS 剩余天数与价值，支持多币种显示">
+    <meta name="keywords" content="VPS,计算器,剩余价值,汇率,服务器,主机">
+    <meta name="theme-color" content="#302b63">
+    <meta property="og:title" content="VPS 剩余价值计算器">
+    <meta property="og:description" content="实时汇率换算，精准计算 VPS 剩余天数与价值，支持多币种显示">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vps.ohminicat.com/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="VPS 剩余价值计算器">
+    <meta name="twitter:description" content="实时汇率换算，精准计算 VPS 剩余天数与价值，支持多币种显示">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <title>VPS 剩余价值计算器</title>
     <link rel="stylesheet" href="style.css">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "VPS 剩余价值计算器",
+        "description": "实时汇率换算，精准计算 VPS 剩余天数与价值，支持多币种显示",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "All",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        }
+    }
+    </script>
 </head>
 <body>
     <div class="background-animation"></div>
-    
+
     <div class="container">
         <header class="header">
             <h1 class="title">
@@ -19,7 +46,7 @@
 
         <div class="card input-card">
             <h2 class="card-title">VPS 信息</h2>
-            
+
             <div class="form-row">
                 <div class="form-group">
                     <label for="price">购买金额 <span id="priceCurrency">(USD)</span></label>
@@ -89,7 +116,7 @@
                         <button class="screenshot-btn secondary" onclick="screenshotDownload()" title="下载截图">💾 下载</button>
                     </div>
                 </div>
-                
+
                 <div class="progress-section">
                     <div class="progress-label">
                         <span>使用进度</span>

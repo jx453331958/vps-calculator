@@ -1,4 +1,5 @@
 const express = require('express');
+const compression = require('compression');
 const fetch = require('node-fetch');
 const path = require('path');
 const crypto = require('crypto');
@@ -24,6 +25,17 @@ function generateVersionHash() {
 
 const VERSION = generateVersionHash();
 console.log(`Asset version: ${VERSION}`);
+
+// Enable gzip compression
+app.use(compression());
+
+// Security headers
+app.use((req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('X-Frame-Options', 'DENY');
+  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
 
 // Cache for exchange rates
 let ratesCache = {
