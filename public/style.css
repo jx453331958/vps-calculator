@@ -188,11 +188,23 @@ select:focus {
 
 input[type="date"] {
     color-scheme: dark;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 12px !important;
+    -webkit-border-radius: 12px !important;
+    background: var(--input-bg);
+    min-height: 50px;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
+    opacity: 0.7;
 }
 
 .rate-display {
