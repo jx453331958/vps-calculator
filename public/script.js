@@ -249,14 +249,12 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     document.getElementById('updateTime').textContent = `更新于 ${timeStr}`;
 }
 
-// Capture a single element as canvas
+// Capture a single element as canvas (no extra padding, raw capture)
 function captureElement(el, opts = {}) {
-    const padding = 24;
     return domToCanvas(el, {
         scale: 2,
         backgroundColor: '#1a1740',
         style: {
-            padding: padding + 'px',
             borderRadius: '0',
             margin: '0',
             overflow: 'visible',
@@ -276,18 +274,18 @@ async function captureResultCard() {
         return true;
     };
 
-    // Use the same width for both cards so they align
-    const padding = 24;
-    const captureWidth = Math.max(inputCard.offsetWidth, resultCard.offsetWidth) + padding * 2;
     const [inputCanvas, resultCanvas] = await Promise.all([
-        captureElement(inputCard, { filter: filterScreenshotBtns, width: captureWidth }),
-        captureElement(resultCard, { filter: filterScreenshotBtns, width: captureWidth }),
+        captureElement(inputCard, { filter: filterScreenshotBtns }),
+        captureElement(resultCard, { filter: filterScreenshotBtns }),
     ]);
 
-    // Stitch two canvases vertically with a gap
-    const gap = 40;
-    const width = Math.max(inputCanvas.width, resultCanvas.width);
-    const height = inputCanvas.height + resultCanvas.height + gap;
+    // Stitch two canvases vertically with padding and gap
+    const scale = 2;
+    const padding = 24 * scale;
+    const gap = 40 * scale;
+    const contentWidth = Math.max(inputCanvas.width, resultCanvas.width);
+    const width = contentWidth + padding * 2;
+    const height = inputCanvas.height + resultCanvas.height + gap + padding * 2;
 
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -296,8 +294,8 @@ async function captureResultCard() {
     ctx.fillStyle = '#1a1740';
     ctx.fillRect(0, 0, width, height);
 
-    ctx.drawImage(inputCanvas, 0, 0);
-    ctx.drawImage(resultCanvas, 0, inputCanvas.height + gap);
+    ctx.drawImage(inputCanvas, padding, padding);
+    ctx.drawImage(resultCanvas, padding, padding + inputCanvas.height + gap);
 
     return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 }
