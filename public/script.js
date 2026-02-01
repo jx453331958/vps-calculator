@@ -21,10 +21,9 @@ async function fetchExchangeRates(retries = 3) {
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
             rateDisplay.value = '';
-            rateDisplay.placeholder = attempt > 1 ? `重试中(${attempt}/${retries})...` : '加载中...';
+            rateDisplay.placeholder = attempt > 1 ? `${t('msg-rate-retry')}(${attempt}/${retries})...` : t('rate-loading');
             if (refreshBtn) refreshBtn.classList.add('spinning');
 
-            // 直接从前端请求汇率 API
             const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD', {
                 method: 'GET',
                 headers: {
@@ -44,11 +43,10 @@ async function fetchExchangeRates(retries = 3) {
             console.error(`Exchange rate fetch attempt ${attempt} failed:`, error);
             if (attempt === retries) {
                 rateDisplay.value = '';
-                rateDisplay.placeholder = '加载失败，点击刷新';
+                rateDisplay.placeholder = t('msg-rate-failed');
                 if (refreshBtn) refreshBtn.classList.remove('spinning');
                 return false;
             }
-            // Wait before retry (1s, 2s)
             await new Promise(r => setTimeout(r, attempt * 1000));
         }
     }
@@ -62,7 +60,6 @@ function updateExchangeRateDisplay() {
     const priceCurrencyLabel = document.getElementById('priceCurrency');
     const rateCurrencyLabel = document.getElementById('rateCurrency');
 
-    // Update currency labels
     if (priceCurrencyLabel) {
         priceCurrencyLabel.textContent = `(${currency})`;
     }
@@ -72,7 +69,7 @@ function updateExchangeRateDisplay() {
 
     if (!exchangeRates) {
         rateDisplay.value = '';
-        rateDisplay.placeholder = '加载中...';
+        rateDisplay.placeholder = t('rate-loading');
         return;
     }
 
@@ -90,11 +87,8 @@ function updateExchangeRateDisplay() {
 // Convert amount from one currency to another
 function convertCurrency(amount, fromCurrency, toCurrency) {
     if (!exchangeRates) return null;
-
-    // Convert to USD first, then to target currency
     const amountInUSD = amount / exchangeRates[fromCurrency];
     const convertedAmount = amountInUSD * exchangeRates[toCurrency];
-
     return convertedAmount;
 }
 
@@ -106,7 +100,7 @@ function formatCurrency(amount, currency) {
 
 // Calculate days between two dates
 function daysBetween(date1, date2) {
-    const oneDay = 24 * 60 * 60 * 1000; // milliseconds in a day
+    const oneDay = 24 * 60 * 60 * 1000;
     const diffTime = Math.abs(date2 - date1);
     return Math.ceil(diffTime / oneDay);
 }
@@ -120,14 +114,16 @@ function initCurrentDate() {
     el.dataset.value = todayStr;
 }
 
+let flatpickrInstance = null;
+
 // Initialize flatpickr for expiry date only
 function initDatePickers() {
     const today = new Date();
     const nextMonth = new Date(today);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
 
-    flatpickr('#expiryDate', {
-        locale: 'zh',
+    flatpickrInstance = flatpickr('#expiryDate', {
+        locale: getLang().startsWith('zh') ? 'zh' : 'default',
         dateFormat: 'Y-m-d',
         disableMobile: true,
         defaultDate: nextMonth,
@@ -145,24 +141,23 @@ async function doCalculate(silent = false) {
     const currentDateStr = document.getElementById('currentDate').dataset.value;
     const expiryDateStr = document.getElementById('expiryDate').value;
 
-    // Validation
     if (!price || price <= 0) {
-        if (!silent) showToast('请输入有效的购买金额', 'error');
+        if (!silent) showToast(t('msg-invalid-price'), 'error');
         return false;
     }
     if (!currentDateStr) {
-        if (!silent) showToast('请选择当前日期', 'error');
+        if (!silent) showToast(t('msg-select-current-date'), 'error');
         return false;
     }
     if (!expiryDateStr) {
-        if (!silent) showToast('请选择到期时间', 'error');
+        if (!silent) showToast(t('msg-select-expiry-date'), 'error');
         return false;
     }
 
     if (!exchangeRates) {
         const success = await fetchExchangeRates();
         if (!success) {
-            if (!silent) showToast('无法获取汇率数据，请检查网络连接后重试', 'error');
+            if (!silent) showToast(t('msg-no-exchange-rate'), 'error');
             return false;
         }
     }
@@ -173,7 +168,7 @@ async function doCalculate(silent = false) {
     expiryDate.setHours(0, 0, 0, 0);
 
     if (expiryDate <= currentDate) {
-        if (!silent) showToast('到期时间必须晚于当前日期', 'error');
+        if (!silent) showToast(t('msg-expiry-after-current'), 'error');
         return false;
     }
 
@@ -185,15 +180,15 @@ async function doCalculate(silent = false) {
 
     document.getElementById('dailyCost').textContent = formatCurrency(dailyCostActual, currency) + ' ' + currency;
     document.getElementById('remainingValue').textContent = formatCurrency(remainingValue, currency) + ' ' + currency;
-    document.getElementById('remainingDays').textContent = remainingDays + ' 天';
+    document.getElementById('remainingDays').textContent = remainingDays + ' ' + t('days-unit');
 
     updateCurrencyDisplay(remainingValue, currency);
 
-    const cycleNames = { 'monthly': '月付(30天)', 'quarterly': '季付(90天)', 'semi-annually': '半年付(180天)', 'annually': '年付(365天)' };
+    const cycleKey = 'cycle-' + paymentCycle;
     document.getElementById('formulaBox').innerHTML = `
-        <div class="formula-line"><strong>剩余天数</strong> = ${expiryDateStr} − ${currentDateStr} = <em>${remainingDays} 天</em></div>
-        <div class="formula-line"><strong>每日成本</strong> = ${price} ${currency} ÷ ${cycleDays}天（${cycleNames[paymentCycle]}） = <em>${formatCurrency(dailyCostActual, currency)} ${currency}/天</em></div>
-        <div class="formula-line"><strong>剩余价值</strong> = ${formatCurrency(dailyCostActual, currency)} × ${remainingDays} = <em>${formatCurrency(remainingValue, currency)} ${currency}</em></div>
+        <div class="formula-line"><strong>${t('formula-remaining-days')}</strong> = ${expiryDateStr} − ${currentDateStr} = <em>${remainingDays} ${t('days-unit')}</em></div>
+        <div class="formula-line"><strong>${t('formula-daily-cost')}</strong> = ${price} ${currency} ÷ ${cycleDays}${t('days-unit')}（${t(cycleKey)}） = <em>${formatCurrency(dailyCostActual, currency)} ${currency}${t('per-day')}</em></div>
+        <div class="formula-line"><strong>${t('formula-remaining-value')}</strong> = ${formatCurrency(dailyCostActual, currency)} × ${remainingDays} = <em>${formatCurrency(remainingValue, currency)} ${currency}</em></div>
     `;
 
     document.getElementById('results').style.display = 'block';
@@ -221,7 +216,6 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     const currencyGrid = document.getElementById('currencyGrid');
     currencyGrid.innerHTML = '';
 
-    // Sort: CNY first, then rest
     const sortedCurrencies = [...CURRENCIES].sort((a, b) => {
         if (a === 'CNY') return -1;
         if (b === 'CNY') return 1;
@@ -229,7 +223,7 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     });
 
     sortedCurrencies.forEach(currency => {
-        if (currency === fromCurrency) return; // Skip the original currency
+        if (currency === fromCurrency) return;
 
         const converted = convertCurrency(amount, fromCurrency, currency);
         if (converted === null) return;
@@ -243,10 +237,10 @@ function updateCurrencyDisplay(amount, fromCurrency) {
         currencyGrid.appendChild(currencyItem);
     });
 
-    // Update time
+    const locale = getLang().startsWith('zh') ? 'zh-CN' : 'en-US';
     const now = new Date();
-    const timeStr = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('updateTime').textContent = `更新于 ${timeStr}`;
+    const timeStr = now.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('updateTime').textContent = `${t('updated-at')} ${timeStr}`;
 }
 
 // Capture a single element as canvas (no extra padding, raw capture)
@@ -267,7 +261,7 @@ function captureElement(el, opts = {}) {
 async function captureResultCard() {
     const inputCard = document.querySelector('.input-card');
     const resultCard = document.getElementById('resultCard');
-    if (!resultCard) throw new Error('请先计算结果');
+    if (!resultCard) throw new Error(t('msg-calculate-first'));
 
     const filterScreenshotBtns = (node) => {
         if (node instanceof Element && node.classList.contains('screenshot-actions')) return false;
@@ -279,7 +273,6 @@ async function captureResultCard() {
         captureElement(resultCard, { filter: filterScreenshotBtns }),
     ]);
 
-    // Stitch two canvases vertically with padding and gap
     const scale = 2;
     const padding = 24 * scale;
     const gap = 40 * scale;
@@ -305,22 +298,20 @@ async function screenshotToClipboard() {
     try {
         const blob = await captureResultCard();
 
-        // Try clipboard API directly
         try {
             await navigator.clipboard.write([
                 new ClipboardItem({ 'image/png': blob })
             ]);
-            showToast('✅ 截图已复制到剪贴板');
+            showToast(t('msg-screenshot-copied'));
             return;
         } catch (clipErr) {
             // clipboard.write not supported or permission denied, fall through
         }
 
-        // Fallback: download
         downloadBlob(blob);
-        showToast('⚠️ 当前浏览器不支持复制图片到剪贴板，已自动下载');
+        showToast(t('msg-clipboard-fallback'));
     } catch (e) {
-        showToast('⚠️ 截图失败: ' + e.message);
+        showToast(t('msg-screenshot-failed') + e.message);
     }
 }
 
@@ -338,9 +329,9 @@ async function screenshotDownload() {
     try {
         const blob = await captureResultCard();
         downloadBlob(blob);
-        showToast('✅ 截图已下载');
+        showToast(t('msg-screenshot-downloaded'));
     } catch (e) {
-        showToast('⚠️ 截图失败: ' + e.message);
+        showToast(t('msg-screenshot-failed') + e.message);
     }
 }
 
@@ -354,8 +345,29 @@ function showToast(msg, type) {
     setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
 }
 
+// Language toggle
+function toggleLang() {
+    const newLang = getLang() === 'zh-CN' ? 'en' : 'zh-CN';
+    setLang(newLang);
+    applyTranslations();
+
+    // Update flatpickr locale
+    if (flatpickrInstance) {
+        flatpickrInstance.set('locale', newLang.startsWith('zh') ? 'zh' : 'default');
+    }
+
+    // Re-calculate if results are shown
+    if (document.getElementById('results').style.display !== 'none') {
+        doCalculate(true);
+    }
+}
+
 // Allow Enter key to trigger calculation
 document.addEventListener('DOMContentLoaded', () => {
+    // Apply initial language
+    setLang(getLang());
+    applyTranslations();
+
     // Initialize dates
     initCurrentDate();
     initDatePickers();
@@ -373,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Allow Enter key to calculate, and auto-recalculate on input change
-    // Exclude flatpickr-managed date inputs — their changes are handled by flatpickr onChange
     const inputs = document.querySelectorAll('.input-card input:not([id="currentDate"]):not([id="expiryDate"]), .input-card select');
     inputs.forEach(input => {
         input.addEventListener('keypress', (e) => {
@@ -390,3 +401,4 @@ document.addEventListener('DOMContentLoaded', () => {
 window.calculate = calculate;
 window.screenshotToClipboard = screenshotToClipboard;
 window.screenshotDownload = screenshotDownload;
+window.toggleLang = toggleLang;

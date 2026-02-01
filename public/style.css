@@ -67,6 +67,28 @@ html {
     text-align: center;
     margin-bottom: 40px;
     animation: fadeInDown 0.8s ease;
+    position: relative;
+}
+
+.lang-toggle-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 6px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.lang-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
 }
 
 @keyframes fadeInDown {
@@ -432,14 +454,6 @@ span.flatpickr-weekday {
 
 .calculate-btn:active {
     transform: translateY(0);
-}
-
-.btn-icon {
-    transition: transform 0.3s ease;
-}
-
-.calculate-btn:hover .btn-icon {
-    transform: translateX(5px);
 }
 
 .results-container {

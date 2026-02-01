@@ -44,116 +44,117 @@
         }
     }
     </script>
+    <script src="i18n.js"></script>
 </head>
 <body>
     <div class="background-animation"></div>
 
     <div class="container">
         <header class="header">
-            <h1 class="title">
+            <button id="langToggleBtn" class="lang-toggle-btn" onclick="toggleLang()"></button>
+            <h1 class="title" data-i18n="title">
                 VPS 剩余价值计算器
             </h1>
-            <p class="subtitle">实时汇率 · 精准计算</p>
+            <p class="subtitle" data-i18n="subtitle">实时汇率 · 精准计算</p>
         </header>
 
         <div class="card input-card">
-            <h2 class="card-title">VPS 信息</h2>
+            <h2 class="card-title" data-i18n="vps-info">VPS 信息</h2>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="price">购买金额 <span id="priceCurrency">(USD)</span></label>
-                    <input type="number" id="price" placeholder="输入金额" step="0.01" min="0" class="form-input">
+                    <label for="price"><span data-i18n="purchase-amount">购买金额</span> <span id="priceCurrency">(USD)</span></label>
+                    <input type="number" id="price" placeholder="输入金额" data-i18n="input-placeholder" data-i18n-target="placeholder" step="0.01" min="0" class="form-input">
                 </div>
 
                 <div class="form-group">
-                    <label for="currency">货币种类</label>
+                    <label for="currency" data-i18n="currency-type">货币种类</label>
                     <select id="currency" class="form-input">
-                        <option value="USD">USD - 美元</option>
-                        <option value="EUR">EUR - 欧元</option>
-                        <option value="GBP">GBP - 英镑</option>
-                        <option value="CNY">CNY - 人民币</option>
-                        <option value="JPY">JPY - 日元</option>
-                        <option value="HKD">HKD - 港币</option>
-                        <option value="SGD">SGD - 新加坡元</option>
-                        <option value="AUD">AUD - 澳元</option>
-                        <option value="CAD">CAD - 加元</option>
+                        <option value="USD" data-i18n="USD">USD - 美元</option>
+                        <option value="EUR" data-i18n="EUR">EUR - 欧元</option>
+                        <option value="GBP" data-i18n="GBP">GBP - 英镑</option>
+                        <option value="CNY" data-i18n="CNY">CNY - 人民币</option>
+                        <option value="JPY" data-i18n="JPY">JPY - 日元</option>
+                        <option value="HKD" data-i18n="HKD">HKD - 港币</option>
+                        <option value="SGD" data-i18n="SGD">SGD - 新加坡元</option>
+                        <option value="AUD" data-i18n="AUD">AUD - 澳元</option>
+                        <option value="CAD" data-i18n="CAD">CAD - 加元</option>
                     </select>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="paymentCycle">付款周期</label>
+                    <label for="paymentCycle" data-i18n="payment-cycle">付款周期</label>
                     <select id="paymentCycle" class="form-input">
-                        <option value="monthly">月付</option>
-                        <option value="quarterly">季付</option>
-                        <option value="semi-annually">半年付</option>
-                        <option value="annually">年付</option>
+                        <option value="monthly" data-i18n="monthly">月付</option>
+                        <option value="quarterly" data-i18n="quarterly">季付</option>
+                        <option value="semi-annually" data-i18n="semi-annually">半年付</option>
+                        <option value="annually" data-i18n="annually">年付</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="exchangeRate">今日汇率 <span id="rateCurrency">(USD)</span><span class="api-source">API: ExchangeRate-API</span></label>
+                    <label for="exchangeRate"><span data-i18n="today-rate">今日汇率</span> <span id="rateCurrency">(USD)</span><span class="api-source" data-i18n="rate-api-source">API: ExchangeRate-API</span></label>
                     <div class="rate-input-wrapper">
-                        <input type="text" id="exchangeRate" readonly placeholder="加载中..." class="form-input rate-display">
-                        <button type="button" id="refreshRateBtn" class="refresh-rate-btn" title="刷新汇率">↻</button>
+                        <input type="text" id="exchangeRate" readonly placeholder="加载中..." data-i18n="rate-loading" data-i18n-target="placeholder" class="form-input rate-display">
+                        <button type="button" id="refreshRateBtn" class="refresh-rate-btn" title="刷新汇率" data-i18n="refresh-rate-title" data-i18n-target="title">↻</button>
                     </div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>当前日期</label>
+                    <label data-i18n="current-date">当前日期</label>
                     <div id="currentDate" class="form-input form-static"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="expiryDate">到期时间</label>
-                    <input type="text" id="expiryDate" placeholder="选择日期" readonly class="form-input cursor-pointer">
+                    <label for="expiryDate" data-i18n="expiry-date">到期时间</label>
+                    <input type="text" id="expiryDate" placeholder="选择日期" data-i18n="select-date" data-i18n-target="placeholder" readonly class="form-input cursor-pointer">
                 </div>
             </div>
 
             <button class="calculate-btn" onclick="calculate()">
-                <span class="btn-text">计算剩余价值</span>
-                <span class="btn-icon">→</span>
+                <span class="btn-text" data-i18n="calculate-btn">计算剩余价值</span>
             </button>
         </div>
 
         <div id="results" class="results-container" style="display: none;">
             <div class="card result-card" id="resultCard">
                 <div class="result-header">
-                    <h2 class="card-title">计算结果</h2>
+                    <h2 class="card-title" data-i18n="result-title">计算结果</h2>
                     <div class="screenshot-actions">
-                        <button class="screenshot-btn" onclick="screenshotToClipboard()" title="复制截图到剪贴板">📋 复制截图</button>
-                        <button class="screenshot-btn secondary" onclick="screenshotDownload()" title="下载截图">💾 下载</button>
+                        <button class="screenshot-btn" onclick="screenshotToClipboard()" title="复制截图到剪贴板" data-i18n="copy-screenshot">📋 复制截图</button>
+                        <button class="screenshot-btn secondary" onclick="screenshotDownload()" title="下载截图" data-i18n="download-screenshot">💾 下载</button>
                     </div>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-item">
-                        <div class="stat-label">每日成本</div>
+                        <div class="stat-label" data-i18n="daily-cost">每日成本</div>
                         <div id="dailyCost" class="stat-value">-</div>
                     </div>
                     <div class="stat-item highlight">
-                        <div class="stat-label">剩余价值</div>
+                        <div class="stat-label" data-i18n="remaining-value">剩余价值</div>
                         <div id="remainingValue" class="stat-value primary">-</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-label">剩余天数</div>
+                        <div class="stat-label" data-i18n="remaining-days">剩余天数</div>
                         <div id="remainingDays" class="stat-value">-</div>
                     </div>
                 </div>
 
                 <div class="currency-section">
                     <h3 class="section-subtitle">
-                        剩余价值（多币种）
+                        <span data-i18n="multi-currency-value">剩余价值（多币种）</span>
                         <span class="update-time" id="updateTime">-</span>
                     </h3>
                     <div id="currencyGrid" class="currency-grid"></div>
                 </div>
 
                 <div class="formula-section">
-                    <h3 class="section-subtitle">计算公式</h3>
+                    <h3 class="section-subtitle" data-i18n="formula-title">计算公式</h3>
                     <div class="formula-box" id="formulaBox">
                     </div>
                 </div>
@@ -161,7 +162,7 @@
         </div>
 
         <footer class="footer">
-            <p>💡 使用实时汇率 API 提供准确换算</p>
+            <p data-i18n="footer-text">💡 使用实时汇率 API 提供准确换算</p>
         </footer>
     </div>
 
