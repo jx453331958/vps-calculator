@@ -167,6 +167,7 @@ input[type="text"],
 input[type="date"],
 select {
     width: 100%;
+    max-width: 100%;
     padding: 15px;
     background: var(--input-bg);
     border: 1px solid var(--card-border);
@@ -175,6 +176,12 @@ select {
     font-size: 1rem;
     transition: all 0.3s ease;
     box-sizing: border-box;
+    min-width: 0;
+}
+
+.form-group {
+    min-width: 0;
+    overflow: hidden;
 }
 
 input[type="number"]:focus,
@@ -195,6 +202,11 @@ input[type="date"] {
     -webkit-border-radius: 12px !important;
     background: var(--input-bg);
     min-height: 50px;
+    max-width: 100%;
+    overflow: hidden;
+    /* iOS Safari reset */
+    -webkit-text-size-adjust: 100%;
+    text-overflow: ellipsis;
 }
 
 input[type="date"]::-webkit-date-and-time-value {
@@ -205,6 +217,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
     opacity: 0.7;
+    padding: 0;
+    margin: 0;
+}
+
+/* iOS Safari specific resets */
+@supports (-webkit-touch-callout: none) {
+    input[type="date"] {
+        min-width: 0;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
 }
 
 .rate-display {
