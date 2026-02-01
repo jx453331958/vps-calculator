@@ -503,8 +503,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     
     .form-group {
         width: 100%;
+        max-width: 100%;
+        overflow: hidden;
     }
-    
+
+    input[type="number"],
+    input[type="text"],
+    input[type="date"],
+    select {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
     input[type="date"] {
         -webkit-appearance: none;
         appearance: none;
@@ -546,6 +556,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     
     .card {
         padding: 20px;
+        overflow: hidden;
     }
 }
 
