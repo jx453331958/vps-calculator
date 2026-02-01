@@ -1,3 +1,5 @@
+import { domToBlob } from 'https://cdn.jsdelivr.net/npm/modern-screenshot@4.6.8/+esm';
+
 let exchangeRates = null;
 
 // Supported currencies
@@ -257,7 +259,7 @@ function updateCurrencyDisplay(amount, fromCurrency) {
 // Capture the container as a blob using modern-screenshot
 async function captureFullPage() {
     const container = document.querySelector('.container');
-    return await modernScreenshot.domToBlob(container, {
+    return await domToBlob(container, {
         scale: 2,
         backgroundColor: '#1a1740',
         style: {
@@ -363,3 +365,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// Expose functions used in onclick attributes to global scope (ES module)
+window.calculate = calculate;
+window.screenshotToClipboard = screenshotToClipboard;
+window.screenshotDownload = screenshotDownload;
