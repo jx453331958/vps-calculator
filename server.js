@@ -12,7 +12,14 @@ let ratesCache = {
   ttl: 3600000 // 1 hour cache
 };
 
-app.use(express.static('public'));
+app.use(express.static('public', {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res) => {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.set('Pragma', 'no-cache');
+  }
+}));
 app.use(express.json());
 
 // API endpoint to get exchange rates
