@@ -22,9 +22,16 @@ async function fetchExchangeRates(retries = 3) {
             rateDisplay.placeholder = attempt > 1 ? `重试中(${attempt}/${retries})...` : '加载中...';
             if (refreshBtn) refreshBtn.classList.add('spinning');
 
-            const response = await fetch('/api/rates');
+            // 直接从前端请求汇率 API
+            const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
             if (!response.ok) {
-                throw new Error('Failed to fetch exchange rates');
+                throw new Error(`API returned ${response.status}`);
             }
             const data = await response.json();
             exchangeRates = data.rates;
