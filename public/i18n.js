@@ -16,6 +16,7 @@ const translations = {
         'calculate-btn': '计算剩余价值',
         'input-placeholder': '输入金额',
         'rate-loading': '加载中...',
+        'target-currency': '目标货币',
         'refresh-rate-title': '刷新汇率',
         'select-date': '选择日期',
 
@@ -100,6 +101,7 @@ const translations = {
         'calculate-btn': 'Calculate Remaining Value',
         'input-placeholder': 'Enter amount',
         'rate-loading': 'Loading...',
+        'target-currency': 'Target Currency',
         'refresh-rate-title': 'Refresh rate',
         'select-date': 'Select date',
 

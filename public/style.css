@@ -388,10 +388,23 @@ span.flatpickr-weekday {
     border-bottom: none !important;
 }
 
+.rate-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.rate-target-select {
+    flex: 0 0 auto;
+    width: auto !important;
+    min-width: 100px;
+}
+
 .rate-input-wrapper {
     position: relative;
     display: flex;
     align-items: center;
+    flex: 1;
 }
 
 .rate-input-wrapper .rate-display {

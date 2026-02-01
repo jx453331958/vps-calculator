@@ -95,10 +95,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="exchangeRate"><span data-i18n="today-rate">今日汇率</span> <span id="rateCurrency">(USD)</span><span class="api-source" data-i18n="rate-api-source">API: ExchangeRate-API</span></label>
-                    <div class="rate-input-wrapper">
-                        <input type="text" id="exchangeRate" readonly placeholder="加载中..." data-i18n="rate-loading" data-i18n-target="placeholder" class="form-input rate-display">
-                        <button type="button" id="refreshRateBtn" class="refresh-rate-btn" title="刷新汇率" data-i18n="refresh-rate-title" data-i18n-target="title">↻</button>
+                    <label for="exchangeRate"><span data-i18n="today-rate">今日汇率</span> <span id="rateCurrency">(USD → CNY)</span><span class="api-source" data-i18n="rate-api-source">API: ExchangeRate-API</span></label>
+                    <div class="rate-row">
+                        <select id="targetCurrency" class="form-input rate-target-select">
+                            <option value="CNY" data-i18n="CNY">CNY - 人民币</option>
+                            <option value="USD" data-i18n="USD">USD - 美元</option>
+                            <option value="EUR" data-i18n="EUR">EUR - 欧元</option>
+                            <option value="GBP" data-i18n="GBP">GBP - 英镑</option>
+                            <option value="JPY" data-i18n="JPY">JPY - 日元</option>
+                            <option value="HKD" data-i18n="HKD">HKD - 港币</option>
+                            <option value="SGD" data-i18n="SGD">SGD - 新加坡元</option>
+                            <option value="AUD" data-i18n="AUD">AUD - 澳元</option>
+                            <option value="CAD" data-i18n="CAD">CAD - 加元</option>
+                        </select>
+                        <div class="rate-input-wrapper">
+                            <input type="text" id="exchangeRate" readonly placeholder="加载中..." data-i18n="rate-loading" data-i18n-target="placeholder" class="form-input rate-display">
+                            <button type="button" id="refreshRateBtn" class="refresh-rate-btn" title="刷新汇率" data-i18n="refresh-rate-title" data-i18n-target="title">↻</button>
+                        </div>
                     </div>
                 </div>
             </div>

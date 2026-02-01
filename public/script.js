@@ -56,6 +56,7 @@ async function fetchExchangeRates(retries = 3) {
 // Update exchange rate display
 function updateExchangeRateDisplay() {
     const currency = document.getElementById('currency').value;
+    const targetCurrency = document.getElementById('targetCurrency').value;
     const rateDisplay = document.getElementById('exchangeRate');
     const priceCurrencyLabel = document.getElementById('priceCurrency');
     const rateCurrencyLabel = document.getElementById('rateCurrency');
@@ -64,7 +65,7 @@ function updateExchangeRateDisplay() {
         priceCurrencyLabel.textContent = `(${currency})`;
     }
     if (rateCurrencyLabel) {
-        rateCurrencyLabel.textContent = `(${currency})`;
+        rateCurrencyLabel.textContent = `(${currency} → ${targetCurrency})`;
     }
 
     if (!exchangeRates) {
@@ -73,13 +74,13 @@ function updateExchangeRateDisplay() {
         return;
     }
 
-    if (currency === 'CNY') {
+    if (currency === targetCurrency) {
         rateDisplay.value = '1.0000';
     } else {
-        const rate = exchangeRates[currency];
-        if (rate) {
-            const cnyRate = rate / exchangeRates['CNY'];
-            rateDisplay.value = (1 / cnyRate).toFixed(4);
+        const fromRate = exchangeRates[currency];
+        const toRate = exchangeRates[targetCurrency];
+        if (fromRate && toRate) {
+            rateDisplay.value = (toRate / fromRate).toFixed(4);
         }
     }
 }
@@ -216,9 +217,10 @@ function updateCurrencyDisplay(amount, fromCurrency) {
     const currencyGrid = document.getElementById('currencyGrid');
     currencyGrid.innerHTML = '';
 
+    const targetCurrency = document.getElementById('targetCurrency').value;
     const sortedCurrencies = [...CURRENCIES].sort((a, b) => {
-        if (a === 'CNY') return -1;
-        if (b === 'CNY') return 1;
+        if (a === targetCurrency) return -1;
+        if (b === targetCurrency) return 1;
         return 0;
     });
 
@@ -377,6 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for currency change to update exchange rate display
     document.getElementById('currency').addEventListener('change', updateExchangeRateDisplay);
+    document.getElementById('targetCurrency').addEventListener('change', updateExchangeRateDisplay);
 
     // Refresh rate button
     const refreshBtn = document.getElementById('refreshRateBtn');
