@@ -5,6 +5,15 @@ let exchangeRates = null;
 // Supported currencies
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'CNY', 'JPY', 'HKD', 'SGD', 'AUD', 'CAD'];
 
+// Save user preferences to localStorage
+function savePreference(key, value) {
+    try { localStorage.setItem('pref_' + key, value); } catch (e) {}
+}
+
+function loadPreference(key) {
+    try { return localStorage.getItem('pref_' + key); } catch (e) { return null; }
+}
+
 // Payment cycle to days mapping
 const CYCLE_DAYS = {
     'monthly': 30,
@@ -120,16 +129,27 @@ let flatpickrInstance = null;
 // Initialize flatpickr for expiry date only
 function initDatePickers() {
     const today = new Date();
-    const nextMonth = new Date(today);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const savedExpiry = loadPreference('expiryDate');
+    let defaultExpiry;
+    if (savedExpiry) {
+        const saved = new Date(savedExpiry);
+        defaultExpiry = saved > today ? saved : null;
+    }
+    if (!defaultExpiry) {
+        defaultExpiry = new Date(today);
+        defaultExpiry.setMonth(defaultExpiry.getMonth() + 1);
+    }
 
     flatpickrInstance = flatpickr('#expiryDate', {
         locale: getLang().startsWith('zh') ? 'zh' : 'default',
         dateFormat: 'Y-m-d',
         disableMobile: true,
-        defaultDate: nextMonth,
+        defaultDate: defaultExpiry,
         onChange(selectedDates, dateStr) {
-            if (dateStr) setTimeout(autoRecalculate, 0);
+            if (dateStr) {
+                savePreference('expiryDate', dateStr);
+                setTimeout(autoRecalculate, 0);
+            }
         },
     });
 }
@@ -374,12 +394,24 @@ document.addEventListener('DOMContentLoaded', () => {
     initCurrentDate();
     initDatePickers();
 
+    // Restore saved preferences
+    const savedCurrency = loadPreference('currency');
+    if (savedCurrency) document.getElementById('currency').value = savedCurrency;
+    const savedTarget = loadPreference('targetCurrency');
+    if (savedTarget) document.getElementById('targetCurrency').value = savedTarget;
+
     // Pre-fetch exchange rates
     fetchExchangeRates();
 
-    // Listen for currency change to update exchange rate display
-    document.getElementById('currency').addEventListener('change', updateExchangeRateDisplay);
-    document.getElementById('targetCurrency').addEventListener('change', updateExchangeRateDisplay);
+    // Listen for currency change to update exchange rate display and save preference
+    document.getElementById('currency').addEventListener('change', (e) => {
+        savePreference('currency', e.target.value);
+        updateExchangeRateDisplay();
+    });
+    document.getElementById('targetCurrency').addEventListener('change', (e) => {
+        savePreference('targetCurrency', e.target.value);
+        updateExchangeRateDisplay();
+    });
 
     // Refresh rate button
     const refreshBtn = document.getElementById('refreshRateBtn');
