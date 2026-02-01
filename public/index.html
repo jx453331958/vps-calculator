@@ -16,19 +16,6 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <title>VPS 剩余价值计算器</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        corePlugins: { preflight: false },
-        theme: {
-          extend: {
-            colors: {
-              primary: { DEFAULT: '#667eea', dark: '#764ba2' },
-            }
-          }
-        }
-      }
-    </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -75,14 +62,12 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="price">购买金额 <span id="priceCurrency">(USD)</span></label>
-                    <input type="number" id="price" placeholder="输入金额" step="0.01" min="0"
-                        class="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30">
+                    <input type="number" id="price" placeholder="输入金额" step="0.01" min="0" class="form-input">
                 </div>
 
                 <div class="form-group">
                     <label for="currency">货币种类</label>
-                    <select id="currency"
-                        class="w-full appearance-none rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30">
+                    <select id="currency" class="form-input">
                         <option value="USD">USD - 美元</option>
                         <option value="EUR">EUR - 欧元</option>
                         <option value="GBP">GBP - 英镑</option>
@@ -99,8 +84,7 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="paymentCycle">付款周期</label>
-                    <select id="paymentCycle"
-                        class="w-full appearance-none rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30">
+                    <select id="paymentCycle" class="form-input">
                         <option value="monthly">月付</option>
                         <option value="quarterly">季付</option>
                         <option value="semi-annually">半年付</option>
@@ -111,8 +95,7 @@
                 <div class="form-group">
                     <label for="exchangeRate">今日汇率 <span id="rateCurrency">(USD)</span><span class="api-source">API: ExchangeRate-API</span></label>
                     <div class="rate-input-wrapper">
-                        <input type="text" id="exchangeRate" readonly placeholder="加载中..."
-                            class="rate-display w-full rounded-xl border border-primary/30 bg-primary/15 px-4 py-3 font-semibold text-indigo-300 outline-none cursor-not-allowed">
+                        <input type="text" id="exchangeRate" readonly placeholder="加载中..." class="form-input rate-display">
                         <button type="button" id="refreshRateBtn" class="refresh-rate-btn" title="刷新汇率">↻</button>
                     </div>
                 </div>
@@ -121,20 +104,18 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>当前日期</label>
-                    <div id="currentDate"
-                        class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white/60 cursor-default select-none"></div>
+                    <div id="currentDate" class="form-input form-static"></div>
                 </div>
 
                 <div class="form-group">
                     <label for="expiryDate">到期时间</label>
-                    <input type="text" id="expiryDate" placeholder="选择日期" readonly
-                        class="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-white placeholder-white/40 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/30 cursor-pointer">
+                    <input type="text" id="expiryDate" placeholder="选择日期" readonly class="form-input cursor-pointer">
                 </div>
             </div>
 
-            <button class="calculate-btn w-full rounded-xl py-4 text-white font-semibold text-lg border-none cursor-pointer transition-all hover:-translate-y-0.5 active:translate-y-0" onclick="calculate()">
+            <button class="calculate-btn" onclick="calculate()">
                 <span class="btn-text">计算剩余价值</span>
-                <span class="btn-icon ml-2">→</span>
+                <span class="btn-icon">→</span>
             </button>
         </div>
 
