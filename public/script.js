@@ -181,11 +181,9 @@ async function doCalculate(silent = false) {
     const remainingDays = daysBetween(currentDate, expiryDate);
     const usedDays = Math.max(0, cycleDays - remainingDays);
     const dailyCostActual = price / cycleDays;
-    const usedValue = dailyCostActual * usedDays;
     const remainingValue = dailyCostActual * remainingDays;
 
     document.getElementById('dailyCost').textContent = formatCurrency(dailyCostActual, currency) + ' ' + currency;
-    document.getElementById('usedValue').textContent = formatCurrency(usedValue, currency) + ' ' + currency;
     document.getElementById('remainingValue').textContent = formatCurrency(remainingValue, currency) + ' ' + currency;
     document.getElementById('remainingDays').textContent = remainingDays + ' 天';
 
