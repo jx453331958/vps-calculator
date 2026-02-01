@@ -278,15 +278,17 @@ async function captureResultCard() {
         return true;
     };
 
+    // Use the same width for both cards so they align
+    const captureWidth = Math.max(inputCard.scrollWidth, resultCard.scrollWidth);
     const [inputCanvas, resultCanvas] = await Promise.all([
-        captureElement(inputCard, { filter: filterScreenshotBtns }),
-        captureElement(resultCard, { filter: filterScreenshotBtns }),
+        captureElement(inputCard, { filter: filterScreenshotBtns, width: captureWidth + 48 }),
+        captureElement(resultCard, { filter: filterScreenshotBtns, width: captureWidth + 48 }),
     ]);
 
     // Stitch two canvases vertically with a gap
     const gap = 40;
     const padding = 48;
-    const width = Math.max(inputCanvas.width, resultCanvas.width) + padding * 2;
+    const width = inputCanvas.width + padding * 2;
     const height = inputCanvas.height + resultCanvas.height + gap + padding * 2;
 
     const canvas = document.createElement('canvas');
