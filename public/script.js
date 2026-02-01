@@ -135,92 +135,90 @@ function setDefaultDates() {
     }
 }
 
-// Calculate remaining value
-async function calculate() {
-    // Get input values
+// Core calculation logic, silent=true skips alerts and scroll
+async function doCalculate(silent = false) {
     const price = parseFloat(document.getElementById('price').value);
     const currency = document.getElementById('currency').value;
     const paymentCycle = document.getElementById('paymentCycle').value;
     const currentDateStr = document.getElementById('currentDate').value;
     const expiryDateStr = document.getElementById('expiryDate').value;
-    
+
     // Validation
     if (!price || price <= 0) {
-        alert('请输入有效的购买金额');
-        return;
+        if (!silent) alert('请输入有效的购买金额');
+        return false;
     }
-    
     if (!currentDateStr) {
-        alert('请选择当前日期');
-        return;
+        if (!silent) alert('请选择当前日期');
+        return false;
     }
-    
     if (!expiryDateStr) {
-        alert('请选择到期时间');
-        return;
+        if (!silent) alert('请选择到期时间');
+        return false;
     }
-    
-    // Fetch exchange rates if not already loaded
+
     if (!exchangeRates) {
         const success = await fetchExchangeRates();
         if (!success) {
-            alert('无法获取汇率数据，请检查网络连接后重试');
-            return;
+            if (!silent) alert('无法获取汇率数据，请检查网络连接后重试');
+            return false;
         }
     }
-    
-    // Parse dates
+
     const currentDate = new Date(currentDateStr);
     const expiryDate = new Date(expiryDateStr);
     currentDate.setHours(0, 0, 0, 0);
     expiryDate.setHours(0, 0, 0, 0);
-    
-    // Validation: expiry date should be after current date
+
     if (expiryDate <= currentDate) {
-        alert('到期时间必须晚于当前日期');
-        return;
+        if (!silent) alert('到期时间必须晚于当前日期');
+        return false;
     }
-    
-    // Calculate days
+
     const cycleDays = CYCLE_DAYS[paymentCycle];
     const remainingDays = daysBetween(currentDate, expiryDate);
     const usedDays = Math.max(0, cycleDays - remainingDays);
-    
-    // Calculate values
     const dailyCostActual = price / cycleDays;
     const usedValue = dailyCostActual * usedDays;
     const remainingValue = dailyCostActual * remainingDays;
     const progressPercent = Math.min(100, (usedDays / cycleDays) * 100);
-    // Update progress bar
+
     document.getElementById('progressBar').style.width = progressPercent + '%';
     document.getElementById('progressPercent').textContent = progressPercent.toFixed(1) + '%';
     document.getElementById('usedInfo').textContent = `已使用 ${usedDays} 天`;
     document.getElementById('remainingInfo').textContent = `剩余 ${remainingDays} 天`;
-    
-    // Update stats
     document.getElementById('dailyCost').textContent = formatCurrency(dailyCostActual, currency) + ' ' + currency;
     document.getElementById('usedValue').textContent = formatCurrency(usedValue, currency) + ' ' + currency;
     document.getElementById('remainingValue').textContent = formatCurrency(remainingValue, currency) + ' ' + currency;
     document.getElementById('remainingDays').textContent = remainingDays + ' 天';
-    
-    // Update multi-currency display
+
     updateCurrencyDisplay(remainingValue, currency);
-    
-    // Update formula with real values
+
     const cycleNames = { 'monthly': '月付(30天)', 'quarterly': '季付(90天)', 'semi-annually': '半年付(180天)', 'annually': '年付(365天)' };
     document.getElementById('formulaBox').innerHTML = `
         <div class="formula-line"><strong>剩余天数</strong> = ${expiryDateStr} − ${currentDateStr} = <em>${remainingDays} 天</em></div>
         <div class="formula-line"><strong>每日成本</strong> = ${price} ${currency} ÷ ${cycleDays}天（${cycleNames[paymentCycle]}） = <em>${formatCurrency(dailyCostActual, currency)} ${currency}/天</em></div>
         <div class="formula-line"><strong>剩余价值</strong> = ${formatCurrency(dailyCostActual, currency)} × ${remainingDays} = <em>${formatCurrency(remainingValue, currency)} ${currency}</em></div>
     `;
-    
-    // Show results
+
     document.getElementById('results').style.display = 'block';
-    
-    // Smooth scroll to results
-    setTimeout(() => {
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 100);
+    return true;
+}
+
+// Button click: validate with alerts + scroll to results
+async function calculate() {
+    const ok = await doCalculate(false);
+    if (ok) {
+        setTimeout(() => {
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+}
+
+// Auto-recalculate silently when inputs change (only if results already shown)
+function autoRecalculate() {
+    if (document.getElementById('results').style.display === 'none') return;
+    doCalculate(true);
 }
 
 // Update currency display
@@ -381,14 +379,16 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshBtn.addEventListener('click', () => fetchExchangeRates(2));
     }
     
-    // Allow Enter key to calculate
-    const inputs = document.querySelectorAll('input, select');
+    // Allow Enter key to calculate, and auto-recalculate on input change
+    const inputs = document.querySelectorAll('.input-card input, .input-card select');
     inputs.forEach(input => {
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 calculate();
             }
         });
+        input.addEventListener('input', autoRecalculate);
+        input.addEventListener('change', autoRecalculate);
     });
 });
 
