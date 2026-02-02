@@ -269,7 +269,7 @@ function updateCurrencyDisplay(amount, fromCurrency) {
 function captureElement(el, opts = {}) {
     return domToCanvas(el, {
         scale: 2,
-        backgroundColor: '#1a1740',
+        backgroundColor: '#0a0a0a',
         style: {
             borderRadius: '0',
             margin: '0',
@@ -306,7 +306,7 @@ async function captureResultCard() {
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#1a1740';
+    ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, width, height);
 
     ctx.drawImage(inputCanvas, padding, padding);

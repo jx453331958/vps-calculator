@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="VPS 剩余价值计算器 - 实时汇率换算，精准计算 VPS 剩余天数与价值，支持多币种显示">
     <meta name="keywords" content="VPS,计算器,剩余价值,汇率,服务器,主机">
-    <meta name="theme-color" content="#302b63">
+    <meta name="theme-color" content="#0a0a0a">
     <meta property="og:title" content="VPS 剩余价值计算器">
     <meta property="og:description" content="实时汇率换算，精准计算 VPS 剩余天数与价值，支持多币种显示">
     <meta property="og:type" content="website">
@@ -16,6 +16,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <title>VPS 剩余价值计算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -46,30 +47,35 @@
     </script>
     <script src="i18n.js"></script>
 </head>
-<body>
-    <div class="background-animation"></div>
+<body class="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+    <!-- Top ambient glow -->
+    <div class="fixed top-0 left-0 right-0 h-[600px] pointer-events-none -z-10"
+        style="background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120,119,198,0.15), transparent)"></div>
 
-    <div class="container">
-        <header class="header">
-            <button id="langToggleBtn" class="lang-toggle-btn" onclick="toggleLang()"></button>
-            <h1 class="title" data-i18n="title">
+    <div class="max-w-4xl mx-auto px-4 py-8 relative z-[1]">
+        <!-- Header -->
+        <header class="text-center mb-8 relative">
+            <button id="langToggleBtn" class="absolute top-0 right-0 px-3 py-1.5 rounded-full bg-white/5 border border-white/[0.08] text-white/50 text-xs hover:bg-white/10 hover:text-white/80 transition-all duration-200" onclick="toggleLang()"></button>
+            <h1 class="text-xl font-bold text-white flex items-center justify-center gap-2 mb-2" data-i18n="title">
                 VPS 剩余价值计算器
             </h1>
-            <p class="subtitle" data-i18n="subtitle">实时汇率 · 精准计算</p>
+            <p class="text-sm text-white/40" data-i18n="subtitle">实时汇率 · 精准计算</p>
         </header>
 
-        <div class="card input-card">
-            <h2 class="card-title" data-i18n="vps-info">VPS 信息</h2>
+        <!-- Input Card -->
+        <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 mb-6 input-card">
+            <h2 class="text-sm font-medium text-white/70 mb-5" data-i18n="vps-info">VPS 信息</h2>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="price"><span data-i18n="purchase-amount">购买金额</span> <span id="priceCurrency">(USD)</span></label>
-                    <input type="number" id="price" placeholder="输入金额" data-i18n="input-placeholder" data-i18n-target="placeholder" step="0.01" min="0" class="form-input">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="price" class="block text-white/50 text-xs font-medium mb-2"><span data-i18n="purchase-amount">购买金额</span> <span id="priceCurrency" class="text-white/30">(USD)</span></label>
+                    <input type="number" id="price" placeholder="输入金额" data-i18n="input-placeholder" data-i18n-target="placeholder" step="0.01" min="0"
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/90 text-sm outline-none placeholder-white/30 focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-all duration-200">
                 </div>
 
-                <div class="form-group">
-                    <label for="currency" data-i18n="currency-type">货币种类</label>
-                    <select id="currency" class="form-input">
+                <div>
+                    <label for="currency" class="block text-white/50 text-xs font-medium mb-2" data-i18n="currency-type">货币种类</label>
+                    <select id="currency" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/90 text-sm outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-all duration-200 appearance-none select-arrow">
                         <option value="USD" data-i18n="USD">USD - 美元</option>
                         <option value="EUR" data-i18n="EUR">EUR - 欧元</option>
                         <option value="GBP" data-i18n="GBP">GBP - 英镑</option>
@@ -83,10 +89,10 @@
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="paymentCycle" data-i18n="payment-cycle">付款周期</label>
-                    <select id="paymentCycle" class="form-input">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="paymentCycle" class="block text-white/50 text-xs font-medium mb-2" data-i18n="payment-cycle">付款周期</label>
+                    <select id="paymentCycle" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/90 text-sm outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-all duration-200 appearance-none select-arrow">
                         <option value="monthly" data-i18n="monthly">月付</option>
                         <option value="quarterly" data-i18n="quarterly">季付</option>
                         <option value="semi-annually" data-i18n="semi-annually">半年付</option>
@@ -94,10 +100,14 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="exchangeRate"><span data-i18n="today-rate">今日汇率</span> <span id="rateCurrency">(USD → CNY)</span><span class="api-source" data-i18n="rate-api-source">API: ExchangeRate-API</span></label>
-                    <div class="rate-row">
-                        <select id="targetCurrency" class="form-input rate-target-select">
+                <div>
+                    <label for="exchangeRate" class="block text-white/50 text-xs font-medium mb-2">
+                        <span data-i18n="today-rate">今日汇率</span>
+                        <span id="rateCurrency" class="text-white/30">(USD → CNY)</span>
+                        <span class="text-white/20 text-[10px] ml-1 italic" data-i18n="rate-api-source">API: ExchangeRate-API</span>
+                    </label>
+                    <div class="flex gap-2 items-center">
+                        <select id="targetCurrency" class="bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white/90 text-sm outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-all duration-200 appearance-none select-arrow w-auto min-w-[100px]">
                             <option value="CNY" data-i18n="CNY">CNY - 人民币</option>
                             <option value="USD" data-i18n="USD">USD - 美元</option>
                             <option value="EUR" data-i18n="EUR">EUR - 欧元</option>
@@ -108,74 +118,78 @@
                             <option value="AUD" data-i18n="AUD">AUD - 澳元</option>
                             <option value="CAD" data-i18n="CAD">CAD - 加元</option>
                         </select>
-                        <div class="rate-input-wrapper">
-                            <input type="text" id="exchangeRate" readonly placeholder="加载中..." data-i18n="rate-loading" data-i18n-target="placeholder" class="form-input rate-display">
-                            <button type="button" id="refreshRateBtn" class="refresh-rate-btn" title="刷新汇率" data-i18n="refresh-rate-title" data-i18n-target="title">↻</button>
+                        <div class="relative flex-1">
+                            <input type="text" id="exchangeRate" readonly placeholder="加载中..." data-i18n="rate-loading" data-i18n-target="placeholder"
+                                class="w-full bg-indigo-500/10 border border-indigo-500/20 rounded-xl px-4 py-2.5 pr-10 text-indigo-300 text-sm font-semibold outline-none cursor-not-allowed">
+                            <button type="button" id="refreshRateBtn" title="刷新汇率" data-i18n="refresh-rate-title" data-i18n-target="title"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 flex items-center justify-center hover:bg-indigo-500/30 transition-all duration-200 text-base">↻</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label data-i18n="current-date">当前日期</label>
-                    <div id="currentDate" class="form-input form-static"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+                <div>
+                    <label class="block text-white/50 text-xs font-medium mb-2" data-i18n="current-date">当前日期</label>
+                    <div id="currentDate" class="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-2.5 text-white/40 text-sm cursor-default select-none"></div>
                 </div>
 
-                <div class="form-group">
-                    <label for="expiryDate" data-i18n="expiry-date">到期时间</label>
-                    <input type="text" id="expiryDate" placeholder="选择日期" data-i18n="select-date" data-i18n-target="placeholder" readonly class="form-input cursor-pointer">
+                <div>
+                    <label for="expiryDate" class="block text-white/50 text-xs font-medium mb-2" data-i18n="expiry-date">到期时间</label>
+                    <input type="text" id="expiryDate" placeholder="选择日期" data-i18n="select-date" data-i18n-target="placeholder" readonly
+                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/90 text-sm outline-none placeholder-white/30 cursor-pointer focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-all duration-200">
                 </div>
             </div>
 
-            <button class="calculate-btn" onclick="calculate()">
-                <span class="btn-text" data-i18n="calculate-btn">计算剩余价值</span>
+            <button class="w-full py-3 bg-gradient-to-r from-indigo-600/80 to-purple-600/80 rounded-xl text-white text-sm font-medium hover:from-indigo-600 hover:to-purple-600 transition-all duration-200 shadow-[0_4px_15px_rgba(99,102,241,0.2)]" onclick="calculate()">
+                <span data-i18n="calculate-btn">计算剩余价值</span>
             </button>
         </div>
 
-        <div id="results" class="results-container" style="display: none;">
-            <div class="card result-card" id="resultCard">
-                <div class="result-header">
-                    <h2 class="card-title" data-i18n="result-title">计算结果</h2>
-                    <div class="screenshot-actions">
-                        <button class="screenshot-btn" onclick="screenshotToClipboard()" title="复制截图到剪贴板" data-i18n="copy-screenshot">📋 复制截图</button>
-                        <button class="screenshot-btn secondary" onclick="screenshotDownload()" title="下载截图" data-i18n="download-screenshot">💾 下载</button>
+        <!-- Results -->
+        <div id="results" style="display: none;">
+            <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-6 mb-6" id="resultCard">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+                    <h2 class="text-sm font-medium text-white/70" data-i18n="result-title">计算结果</h2>
+                    <div class="flex gap-2">
+                        <button class="screenshot-btn px-3 py-1.5 bg-white/5 border border-white/[0.08] rounded-lg text-white/60 text-xs hover:bg-white/10 hover:text-white/80 transition-all duration-200" onclick="screenshotToClipboard()" title="复制截图到剪贴板" data-i18n="copy-screenshot">📋 复制截图</button>
+                        <button class="screenshot-btn px-3 py-1.5 bg-white/5 border border-white/[0.08] rounded-lg text-white/60 text-xs hover:bg-white/10 hover:text-white/80 transition-all duration-200" onclick="screenshotDownload()" title="下载截图" data-i18n="download-screenshot">💾 下载</button>
                     </div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-label" data-i18n="daily-cost">每日成本</div>
-                        <div id="dailyCost" class="stat-value">-</div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                    <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
+                        <div class="text-white/40 text-xs mb-1.5" data-i18n="daily-cost">每日成本</div>
+                        <div id="dailyCost" class="text-white text-lg font-bold">-</div>
                     </div>
-                    <div class="stat-item highlight">
-                        <div class="stat-label" data-i18n="remaining-value">剩余价值</div>
-                        <div id="remainingValue" class="stat-value primary">-</div>
+                    <div class="bg-indigo-500/[0.06] border border-indigo-500/30 rounded-xl p-4">
+                        <div class="text-white/40 text-xs mb-1.5" data-i18n="remaining-value">剩余价值</div>
+                        <div id="remainingValue" class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 text-xl font-bold">-</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-label" data-i18n="remaining-days">剩余天数</div>
-                        <div id="remainingDays" class="stat-value">-</div>
+                    <div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4">
+                        <div class="text-white/40 text-xs mb-1.5" data-i18n="remaining-days">剩余天数</div>
+                        <div id="remainingDays" class="text-white text-lg font-bold">-</div>
                     </div>
                 </div>
 
-                <div class="currency-section">
-                    <h3 class="section-subtitle">
+                <div class="border-t border-white/[0.06] pt-5 mb-5">
+                    <h3 class="text-xs font-medium text-white/50 mb-3 flex justify-between items-center">
                         <span data-i18n="multi-currency-value">剩余价值（多币种）</span>
-                        <span class="update-time" id="updateTime">-</span>
+                        <span class="text-white/30 text-[10px] font-normal" id="updateTime">-</span>
                     </h3>
-                    <div id="currencyGrid" class="currency-grid"></div>
+                    <div id="currencyGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
                 </div>
 
-                <div class="formula-section">
-                    <h3 class="section-subtitle" data-i18n="formula-title">计算公式</h3>
-                    <div class="formula-box" id="formulaBox">
-                    </div>
+                <div class="border-t border-white/[0.06] pt-5">
+                    <h3 class="text-xs font-medium text-white/50 mb-3" data-i18n="formula-title">计算公式</h3>
+                    <div id="formulaBox" class="bg-white/5 rounded-lg p-4 text-xs leading-6 text-white/50 font-mono"></div>
                 </div>
             </div>
         </div>
 
-        <footer class="footer">
-            <p data-i18n="footer-text">💡 使用实时汇率 API 提供准确换算</p>
+        <!-- Footer -->
+        <footer class="text-center py-4">
+            <p class="text-white/20 text-xs" data-i18n="footer-text">💡 使用实时汇率 API 提供准确换算</p>
         </footer>
     </div>
 
