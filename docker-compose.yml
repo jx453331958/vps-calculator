@@ -1,6 +1,6 @@
 services:
   vps-calculator:
-    build: .
+    image: ghcr.io/jx453331958/vps-calculator:latest
     container_name: vps-calculator
     ports:
       - "3457:3457"
