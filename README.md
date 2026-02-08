@@ -24,10 +24,43 @@
 
 ### 快速开始
 
-#### Docker Compose（推荐）
+#### Docker 部署（推荐）
+
+预构建的多平台镜像（amd64/arm64）托管在 GitHub Container Registry，每次推送到 main 分支时通过 GitHub Actions 自动构建。
 
 ```bash
-docker-compose up -d
+git clone https://github.com/jx453331958/vps-calculator.git
+cd vps-calculator
+./deploy.sh deploy
+```
+
+或者不克隆仓库，直接使用 Docker：
+
+```bash
+docker pull ghcr.io/jx453331958/vps-calculator:latest
+
+docker run -d \
+  --name vps-calculator \
+  -p 3457:3457 \
+  ghcr.io/jx453331958/vps-calculator:latest
+```
+
+可用的镜像标签：
+- `latest` — main 分支最新构建
+- `<commit-sha>` — 指定提交（如 `ghcr.io/jx453331958/vps-calculator:abc1234`）
+- `<version>` — 语义化版本号（如 `ghcr.io/jx453331958/vps-calculator:1.0.0`）
+
+#### 部署脚本
+
+```bash
+./deploy.sh deploy   # 首次部署
+./deploy.sh update   # 拉取最新镜像并重启
+./deploy.sh start    # 启动服务
+./deploy.sh stop     # 停止服务
+./deploy.sh restart  # 重启服务
+./deploy.sh status   # 查看状态
+./deploy.sh logs     # 查看日志
+./deploy.sh clean    # 删除容器和镜像
 ```
 
 #### 手动运行
@@ -105,10 +138,43 @@ A sleek VPS remaining value calculator with real-time exchange rates, multi-curr
 
 ### Quick Start
 
-#### Docker Compose (Recommended)
+#### Docker Deployment (Recommended)
+
+Pre-built multi-platform images (amd64/arm64) are available on GitHub Container Registry, automatically built via GitHub Actions on every push to main.
 
 ```bash
-docker-compose up -d
+git clone https://github.com/jx453331958/vps-calculator.git
+cd vps-calculator
+./deploy.sh deploy
+```
+
+Or use Docker directly without cloning:
+
+```bash
+docker pull ghcr.io/jx453331958/vps-calculator:latest
+
+docker run -d \
+  --name vps-calculator \
+  -p 3457:3457 \
+  ghcr.io/jx453331958/vps-calculator:latest
+```
+
+Available image tags:
+- `latest` — latest build from main branch
+- `<commit-sha>` — specific commit (e.g. `ghcr.io/jx453331958/vps-calculator:abc1234`)
+- `<version>` — semantic version when tagged (e.g. `ghcr.io/jx453331958/vps-calculator:1.0.0`)
+
+#### Deploy Script
+
+```bash
+./deploy.sh deploy   # First-time deployment
+./deploy.sh update   # Pull latest image and restart
+./deploy.sh start    # Start the service
+./deploy.sh stop     # Stop the service
+./deploy.sh restart  # Restart the service
+./deploy.sh status   # Show status
+./deploy.sh logs     # View logs
+./deploy.sh clean    # Remove containers and images
 ```
 
 #### Manual
